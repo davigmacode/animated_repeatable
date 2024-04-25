@@ -10,7 +10,7 @@ class LoopTransition extends StatefulWidget {
     this.delay = Duration.zero,
     this.duration = const Duration(milliseconds: 200),
     this.curve = Curves.linear,
-    this.repeat = 0,
+    this.repeat = -1,
     this.transition = LoopTransition.fade,
     required this.child,
   }) : assert(repeat >= -1);
