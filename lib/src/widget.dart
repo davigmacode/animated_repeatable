@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/widgets.dart';
 import 'types.dart';
 
@@ -70,6 +71,171 @@ class LoopTransition extends StatefulWidget {
       opacity: animation,
       child: child,
     );
+  }
+
+  /// Animates [child] by rotating them around a central point.
+  static const spin = _spin;
+  static Widget _spin(Widget child, Animation<double> animation) {
+    return RotationTransition(
+      key: ValueKey<Key?>(child.key),
+      turns: animation,
+      child: child,
+    );
+  }
+
+  /// Provides a convenient way to create basic sliding animations
+  /// for your [child] widget within the LoopTransition framework.
+  /// Control the direction and distance of the slide using the [to] and [from] offsets.
+  ///
+  /// **[to]** (required, Offset) : Defines the ending position of
+  /// the slide animation relative to the child widget's original location.
+  /// This offset specifies the horizontal and vertical movement
+  /// of the child widget during the animation.
+  ///
+  /// **[from]** (optional, Offset, defaults to Offset.zero) :
+  /// Defines the starting position of the slide animation relative to
+  /// the child widget's original location. Defaults to Offset.zero,
+  /// which means the animation starts with the child widget in its original position.
+  static LoopTransitionBuilder slide(
+    Offset to, [
+    Offset from = Offset.zero,
+  ]) {
+    return (child, final animation) {
+      final tween = Tween<Offset>(
+        begin: from,
+        end: to,
+      );
+
+      return SlideTransition(
+        position: tween.animate(animation),
+        child: child,
+      );
+    };
+  }
+
+  /// Creates a transition builder that produces a zooming effect on the [child] widget.
+  ///
+  /// **[from]** (optional, double) : Defines the starting scale of the [child] widget
+  /// during the animation cycle. Defaults to 0.0, which means the [child] widget starts off
+  /// completely zoomed out (invisible).
+  ///
+  /// **[to]** (optional, double) : Defines the ending scale of the [child] widget
+  /// during the animation cycle. Defaults to 1.0, which means the [child] widget ends up
+  /// at its original size.
+  static LoopTransitionBuilder zoom([
+    double from = 0,
+    double to = 1,
+  ]) {
+    return (Widget child, Animation<double> animation) {
+      final tween = Tween<double>(
+        begin: from,
+        end: to,
+      );
+      return ScaleTransition(
+        key: ValueKey(child.key),
+        scale: tween.animate(animation),
+        child: child,
+      );
+    };
+  }
+
+  /// Creates a transition builder specifically
+  /// designed for creating a shimmering effect.
+  ///
+  /// **[colors]** (required, List<Color>) : A list of colors
+  /// used to create the shimmering effect. The animation cycles
+  /// through these colors to produce the shimmer.
+  ///
+  /// **[stops]** (optional, List<double>) : A list of values between 0.0 and 1.0
+  /// that specify the position of each color within the gradient. If omitted,
+  /// colors will be spread evenly.
+  ///
+  /// **[begin]** (optional, AlignmentGeometry) : Defines the starting point of
+  /// the shimmer gradient. Defaults to Alignment.topLeft.
+  ///
+  /// **[end]** (optional, AlignmentGeometry) : Defines the ending point of the shimmer gradient.
+  /// Defaults to Alignment.centerRight. This controls the direction of the shimmer animation.
+  ///
+  /// **[tileMode]** (optional, TileMode) : Specifies how the gradient should be tiled
+  /// if the child widget is larger than the gradient itself. Defaults to TileMode.clamp,
+  /// which clamps the gradient to the edges of the child widget.
+  ///
+  /// **[direction]** (optional, AxisDirection) : Defines the direction in which
+  /// the shimmer animation moves. Defaults to AxisDirection.right,
+  /// which means the shimmer moves from left to right.
+  ///
+  /// **[blendMode]** (optional, BlendMode) : Determines how the shimmer gradient
+  /// is blended with the child widget. Defaults to BlendMode.srcATop,
+  /// which places the source color over the destination color.
+  static LoopTransitionBuilder shimmer({
+    required List<Color> colors,
+    List<double>? stops,
+    AlignmentGeometry begin = Alignment.topLeft,
+    AlignmentGeometry end = Alignment.centerRight,
+    TileMode tileMode = TileMode.clamp,
+    AxisDirection direction = AxisDirection.right,
+    BlendMode blendMode = BlendMode.srcATop,
+  }) {
+    return (child, final animation) {
+      final gradient = LinearGradient(
+        colors: colors,
+        stops: stops,
+        begin: begin,
+        end: end,
+        tileMode: tileMode,
+        transform: GradientSlide(
+          direction: direction,
+          progress: animation.value,
+        ),
+      );
+      return ShaderMask(
+        blendMode: blendMode,
+        shaderCallback: (bounds) {
+          return gradient.createShader(bounds);
+        },
+        child: child,
+      );
+    };
+  }
+
+  /// Creates a transition builder for that animates [child]
+  /// by shaking it horizontally or vertically.
+  ///
+  /// [direction] (optional): An `Axis` value that controls the shaking direction.
+  /// Defaults to `Axis.horizontal`, which shakes the widget back and forth horizontally.
+  /// You can also use `Axis.vertical` to shake the widget up and down vertically.
+  ///
+  /// [distance] (optional): A `double` value that determines
+  /// the maximum offset of the shaking movement. Defaults to `3.0`,
+  /// which creates a moderate shaking effect. Higher values will
+  /// result in more pronounced shaking.
+  static LoopTransitionBuilder shake({
+    Axis direction = Axis.horizontal,
+    double distance = 5,
+  }) {
+    return (child, final animation) {
+      final isHorizontal = direction == Axis.horizontal;
+      final d = sin(animation.value * pi * distance) * distance;
+      return Transform.translate(
+        offset: Offset(
+          isHorizontal ? d : 0.0,
+          isHorizontal ? 0 : d,
+        ),
+        child: child,
+      );
+    };
+  }
+
+  /// Animates [child] by shake them along the horizontal axis.
+  static const shakeX = _shakeX;
+  static Widget _shakeX(Widget child, Animation<double> animation) {
+    return shake(direction: Axis.horizontal)(child, animation);
+  }
+
+  /// Animates [child] by shake them along the vertical axis.
+  static const shakeY = _shakeY;
+  static Widget _shakeY(Widget child, Animation<double> animation) {
+    return shake(direction: Axis.vertical)(child, animation);
   }
 
   /// Indicates both [forward] and [reverse] are `true`
