@@ -11,9 +11,12 @@ class LoopTransition extends StatefulWidget {
     this.duration = const Duration(milliseconds: 200),
     this.curve = Curves.linear,
     this.repeat = -1,
+    this.forward = true,
+    this.reverse = false,
     this.transition = LoopTransition.fade,
     required this.child,
-  }) : assert(repeat >= -1);
+  })  : assert(repeat >= -1),
+        assert(forward == true || reverse == true);
 
   /// The delay before the animation starts.
   final Duration delay;
@@ -28,6 +31,28 @@ class LoopTransition extends StatefulWidget {
   /// You can set it to repeat indefinitely by using repeat: `-1`,
   /// a specific number of times, or zero for a single play-through (repeat: `0`).
   final int repeat;
+
+  /// Defaults to true. When set to true, the animation plays forward as defined by
+  /// the provided transition function (e.g., fading in for LoopTransition.fade).
+  ///
+  /// When both [forward] and [reverse] are `true`,
+  /// the animation plays forward for a while (defined by the animation duration)
+  /// and then immediately switches to playing in reverse for the same duration.
+  /// This creates a mirroring effect as the animation goes back and forth
+  /// between its starting and ending states within a single loop iteration.
+  final bool forward;
+
+  /// Defaults to false. When set to true, the animation plays in reverse order.
+  /// This means the transition function would be applied in a reversed manner.
+  /// For example, with LoopTransition.fade and reverse: true,
+  /// the child widget would start fully opaque and fade out during the animation.
+  ///
+  /// When both [forward] and [reverse] are `true`,
+  /// the animation plays forward for a while (defined by the animation duration)
+  /// and then immediately switches to playing in reverse for the same duration.
+  /// This creates a mirroring effect as the animation goes back and forth
+  /// between its starting and ending states within a single loop iteration.
+  final bool reverse;
 
   /// Defines the type of animation applied to the child widget.
   /// By default, it uses a fade transition (LoopTransition.fade).
@@ -47,6 +72,9 @@ class LoopTransition extends StatefulWidget {
     );
   }
 
+  /// Indicates both [forward] and [reverse] are `true`
+  bool get mirror => forward && reverse;
+
   @override
   State<LoopTransition> createState() => _LoopTransitionState();
 }
@@ -60,26 +88,46 @@ class _LoopTransitionState extends State<LoopTransition>
   late Animation<double> animation;
 
   /// Track of how many times the animation cycle has finished playing.
-  double counter = 0;
+  int cycle = 0;
 
   /// Connects curve with the controller
   void buildAnimation() {
-    animation = CurvedAnimation(parent: controller, curve: widget.curve);
+    final tween = widget.forward || widget.mirror
+        ? Tween<double>(begin: 0, end: 1)
+        : Tween<double>(begin: 1, end: 0);
+    animation = tween.animate(
+      CurvedAnimation(
+        parent: controller,
+        curve: widget.curve,
+      ),
+    );
   }
 
   /// Start the animation
   void startAnimation() {
     // Reset the animation counter
-    counter = 0;
+    cycle = 0;
     controller.forward(from: 0);
   }
 
   void _handleEvents() {
     if (controller.isCompleted) {
-      counter++;
-      if (widget.repeat > -1 && counter > widget.repeat) return;
+      if (widget.repeat > -1 && cycle > widget.repeat) return;
+      cycle++;
       Future.delayed(widget.delay, () {
-        controller.forward(from: 0);
+        if (widget.mirror) {
+          controller.reverse();
+        } else {
+          controller.forward(from: 0);
+        }
+      });
+    }
+    if (controller.isDismissed) {
+      if (widget.repeat > -1 && cycle > widget.repeat) return;
+      Future.delayed(widget.delay, () {
+        if (widget.mirror) {
+          controller.forward();
+        }
       });
     }
     setState(() {});
