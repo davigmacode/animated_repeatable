@@ -8,6 +8,7 @@ class LoopTransition extends StatefulWidget {
   /// Create a repeatable animated transition.
   const LoopTransition({
     super.key,
+    this.pause = false,
     this.delay = Duration.zero,
     this.duration = const Duration(milliseconds: 200),
     this.curve = Curves.linear,
@@ -18,6 +19,11 @@ class LoopTransition extends StatefulWidget {
     required this.child,
   })  : assert(repeat >= -1),
         assert(forward == true || reverse == true);
+
+  /// When set to true, the animation playback is paused.
+  /// When set to false (default), the animation plays normally
+  /// according to the defined loop count [repeat].
+  final bool pause;
 
   /// The delay before the animation starts.
   final Duration delay;
@@ -269,11 +275,19 @@ class _LoopTransitionState extends State<LoopTransition>
     );
   }
 
-  /// Start the animation
-  void startAnimation() {
+  /// Run the animation
+  void runAnimation() {
     // Reset the animation counter
     cycle = 0;
-    controller.forward(from: 0);
+    if (widget.pause) {
+      controller.stop();
+    } else {
+      if (controller.status == AnimationStatus.reverse) {
+        controller.reverse();
+      } else {
+        controller.forward();
+      }
+    }
   }
 
   void _handleEvents() {
@@ -318,7 +332,7 @@ class _LoopTransitionState extends State<LoopTransition>
 
     // Connects curve with the controller and start it.
     buildAnimation();
-    startAnimation();
+    runAnimation();
   }
 
   @override
@@ -328,7 +342,7 @@ class _LoopTransitionState extends State<LoopTransition>
 
     // Connects curve with the controller and start it.
     buildAnimation();
-    startAnimation();
+    runAnimation();
 
     super.didUpdateWidget(oldWidget);
   }
