@@ -110,9 +110,18 @@ class LoopTransition extends StatefulWidget {
   /// The [curve] of the animation. By default it's [Curves.linear].
   final Curve curve;
 
-  /// Controls how many times the animation repeats.
-  /// You can set it to repeat indefinitely by using repeat: `-1`,
-  /// a specific number of times, or zero for a single play-through (repeat: `0`).
+  /// Controls how many times the entire animation loop
+  /// (forward and potentially backward if reverse is true) will be played.
+  /// Regardless of the repeat value, the animation will always play through
+  /// one complete cycle (forward and potentially backward) before considering the repeat condition.
+  ///
+  /// Here's how repeat actually works:
+  /// * `repeat = -1` (default): Plays the animation indefinitely (loops forever).
+  /// * `repeat = 0`: Plays the animation one time only (one cycle).
+  /// * `repeat = 1`: Plays the animation twice (one complete loop, then repeats the entire loop again).
+  /// * `repeat > 1`: Plays the animation for the specified number of loops in addition to the initial cycle. For example, repeat = 3 plays the animation four times in total (one initial cycle + three repeats).
+  ///
+  /// In essence, the repeat property doesn't affect whether the animation plays one cycle initially. It controls how many times the entire loop repeats after the first cycle.
   final int repeat;
 
   /// Defaults to true. When set to true, the animation plays forward as defined by

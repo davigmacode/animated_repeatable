@@ -1,3 +1,9 @@
+## 1.1.0
+
+* Added lifecycle callbacks and improved behavior.
+* Separated constructor for mirroring transition.
+* Added optional delay and duration for backward transition.
+
 ## 1.0.0
 
 * Repeatable animations.
