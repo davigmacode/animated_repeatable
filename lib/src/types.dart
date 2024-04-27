@@ -8,6 +8,54 @@ typedef LoopTransitionBuilder = Widget Function(
   Animation<double> animation,
 );
 
+/// This typedef defines a function signature used
+/// within the LoopTransition widget. It's essentially a function
+/// that builds the animated widget based on the provided parameters.
+typedef LoopTransitionWrapperBuilder = Widget Function(
+  Widget child,
+  LoopAnimationStatus status,
+);
+
+/// This class provides information about the current state
+/// of a LoopTransition animation. It offers properties to
+/// track various animation lifecycle stages
+/// and details about the animation's behavior.
+class LoopAnimationStatus {
+  LoopAnimationStatus({
+    required this.isInitialized,
+    required this.isAnimating,
+    required this.isCompleted,
+    required this.isDefinitely,
+    required this.isMirror,
+    required this.cycle,
+  });
+
+  /// Track whether the animation has initially run.
+  final bool isInitialized;
+
+  /// Track whether the animation is running.
+  final bool isAnimating;
+
+  /// Track whether all specified loops have finished playing
+  /// (if repeat is not set to -1 for infinite loops).
+  final bool isCompleted;
+
+  /// Indicates repeat definitely.
+  final bool isDefinitely;
+
+  /// Indicates that the animation is mirroring.
+  final bool isMirror;
+
+  /// Track of how many times the animation cycle has finished playing.
+  final int cycle;
+
+  /// Indicates either [forward] or [reverse] direction.
+  bool get isNotMirror => !isMirror;
+
+  /// Indicates repeat indefinitely
+  bool get isIndefinitely => !isDefinitely;
+}
+
 /// Provides a way to dynamically position a gradient
 /// within a defined area by sliding it in a specified direction
 /// with a controllable amount of movement.

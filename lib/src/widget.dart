@@ -28,6 +28,7 @@ class LoopTransition extends StatefulWidget {
   ///  * [onContinue]: A callback function called whenever the animation is resumed after being paused.
   ///  * [onCycle]: A callback function called every time the animation completes a single loop iteration (forward and potentially backward if reverse is true).
   ///  * [onComplete]: A callback function called only once when all loops have finished playing (if repeat is not set to -1 for infinite loops).
+  ///  * [wrapper]: control how the child widget is transformed based on the animation's progress and current state.
   ///  * [child]: The widget that will be animated during the transition. This is a required parameter.
   const LoopTransition({
     super.key,
@@ -43,6 +44,7 @@ class LoopTransition extends StatefulWidget {
     this.onContinue,
     this.onCycle,
     this.onComplete,
+    this.wrapper,
     required this.child,
   })  : forward = !reverse,
         reverseDelay = null,
@@ -72,6 +74,7 @@ class LoopTransition extends StatefulWidget {
     this.onContinue,
     this.onCycle,
     this.onComplete,
+    this.wrapper,
     required this.child,
   })  : forward = true,
         reverse = true,
@@ -167,6 +170,11 @@ class LoopTransition extends StatefulWidget {
   /// Called when all specified loops have finished playing
   /// (if repeat is not set to -1 for infinite loops).
   final VoidCallback? onComplete;
+
+  /// It allows you to control how the child widget
+  /// is transformed based on the animation's progress
+  /// and current state (LoopAnimationStatus).
+  final LoopTransitionWrapperBuilder? wrapper;
 
   /// The mandatory widget that will be animated during the transition.
   final Widget child;
@@ -420,8 +428,11 @@ class _LoopTransitionState extends State<LoopTransition>
     }
   }
 
+  /// End the animation
   void endAnimation() {
-    completed = true;
+    setState(() {
+      completed = true;
+    });
     widget.onComplete?.call();
   }
 
@@ -502,9 +513,11 @@ class _LoopTransitionState extends State<LoopTransition>
       controller.reset();
     }
 
-    // Connects curve with the controller and start it.
-    buildAnimation();
-    runAnimation();
+    if (widget.pause != oldWidget.pause) {
+      // Connects curve with the controller and start it.
+      buildAnimation();
+      runAnimation();
+    }
 
     super.didUpdateWidget(oldWidget);
   }
@@ -517,6 +530,15 @@ class _LoopTransitionState extends State<LoopTransition>
 
   @override
   Widget build(BuildContext context) {
-    return widget.transition(widget.child, animation);
+    final status = LoopAnimationStatus(
+      isInitialized: initialized,
+      isAnimating: !widget.pause,
+      isCompleted: completed,
+      isDefinitely: widget.repeat > -1,
+      isMirror: widget.forward && widget.reverse,
+      cycle: cycle,
+    );
+    final child = widget.wrapper?.call(widget.child, status) ?? widget.child;
+    return widget.transition(child, animation);
   }
 }
