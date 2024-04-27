@@ -40,10 +40,10 @@ class MyHomePage extends StatelessWidget {
                   reverse: true,
                   child: FlutterLogo(size: 64),
                 ),
-                LoopTransition(
+                LoopTransition.mirror(
                   curve: Curves.easeInOut,
                   duration: const Duration(milliseconds: 1500),
-                  reverse: true,
+                  reverseDuration: const Duration(milliseconds: 500),
                   transition: LoopTransition.zoom(.5, 1.2),
                   child: const Icon(
                     Icons.favorite,
@@ -68,7 +68,6 @@ class MyHomePage extends StatelessWidget {
                 PausableTransition(),
                 LoopTransition(
                   duration: Duration(milliseconds: 1500),
-                  forward: false,
                   reverse: true,
                   transition: LoopTransition.spin,
                   child: Icon(
@@ -157,26 +156,7 @@ class MyHomePage extends StatelessWidget {
                     ),
                   ),
                 ),
-                LoopTransition(
-                  curve: Curves.linear,
-                  delay: const Duration(milliseconds: 1000),
-                  duration: const Duration(milliseconds: 900),
-                  transition: LoopTransition.shimmer(
-                    colors: [
-                      Colors.black87,
-                      Colors.white,
-                      Colors.black87,
-                      Colors.black87,
-                    ],
-                    end: Alignment.topCenter,
-                    begin: Alignment.bottomCenter,
-                    direction: AxisDirection.up,
-                  ),
-                  child: const ThreeArrows(
-                    direction: AxisDirection.up,
-                    size: 32,
-                  ),
-                ),
+                const InteractiveThreeArrows(),
               ],
             ),
           ],
@@ -202,6 +182,11 @@ class _PausableTransitionState extends State<PausableTransition> {
     });
   }
 
+  void log(Object? data) {
+    // ignore: avoid_print
+    print(data);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -209,15 +194,55 @@ class _PausableTransitionState extends State<PausableTransition> {
       child: MouseRegion(
         onEnter: (_) => toggle(true),
         onExit: (_) => toggle(false),
-        child: LoopTransition(
+        child: LoopTransition.mirror(
           pause: paused,
+          repeat: 10,
+          onStart: () => log('onStart'),
+          onPause: () => log('onPause'),
+          onContinue: () => log('onContinue'),
+          onCycle: () => log('onCycle'),
+          onComplete: () => log('onComplete'),
           duration: const Duration(milliseconds: 1000),
-          reverse: true,
           transition: LoopTransition.spin,
           child: const Icon(
             Icons.settings,
             size: 64,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class InteractiveThreeArrows extends StatelessWidget {
+  const InteractiveThreeArrows({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return LoopTransition.mirror(
+      curve: Curves.easeInCubic,
+      delay: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 900),
+      reverseDelay: Duration.zero,
+      transition: LoopTransition.slide(const Offset(0, -.3)),
+      child: LoopTransition(
+        curve: Curves.linear,
+        delay: const Duration(milliseconds: 1000),
+        duration: const Duration(milliseconds: 900),
+        transition: LoopTransition.shimmer(
+          colors: [
+            Colors.blue,
+            Colors.white,
+            Colors.blue,
+            Colors.blue,
+          ],
+          end: Alignment.topCenter,
+          begin: Alignment.bottomCenter,
+          direction: AxisDirection.up,
+        ),
+        child: const ThreeArrows(
+          direction: AxisDirection.up,
+          size: 32,
         ),
       ),
     );
