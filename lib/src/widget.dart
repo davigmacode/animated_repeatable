@@ -16,6 +16,11 @@ class LoopTransition extends StatefulWidget {
     this.forward = true,
     this.reverse = false,
     this.transition = LoopTransition.fade,
+    this.onStart,
+    this.onPause,
+    this.onContinue,
+    this.onCycle,
+    this.onComplete,
     required this.child,
   })  : assert(repeat >= -1),
         assert(forward == true || reverse == true);
@@ -65,6 +70,23 @@ class LoopTransition extends StatefulWidget {
   /// By default, it uses a fade transition (LoopTransition.fade).
   /// You can potentially provide your own custom transition function here.
   final LoopTransitionBuilder transition;
+
+  /// Called only once at the very beginning when
+  /// the animation starts playing for the first time.
+  final VoidCallback? onStart;
+
+  /// Called when the animation is paused.
+  final VoidCallback? onPause;
+
+  /// Called when the animation is resumed after being paused.
+  final VoidCallback? onContinue;
+
+  /// Called when a complete loop iteration finishes.
+  final VoidCallback? onCycle;
+
+  /// Called when all specified loops have finished playing
+  /// (if repeat is not set to -1 for infinite loops).
+  final VoidCallback? onComplete;
 
   /// The mandatory widget that will be animated during the transition.
   final Widget child;
@@ -244,9 +266,6 @@ class LoopTransition extends StatefulWidget {
     return shake(direction: Axis.vertical)(child, animation);
   }
 
-  /// Indicates both [forward] and [reverse] are `true`
-  bool get mirror => forward && reverse;
-
   @override
   State<LoopTransition> createState() => _LoopTransitionState();
 }
@@ -259,12 +278,34 @@ class _LoopTransitionState extends State<LoopTransition>
   /// The [Animation] that is driven by the [AnimationController].
   late Animation<double> animation;
 
+  /// Track whether the animation has initially run.
+  bool initialized = false;
+
+  /// Track whether all specified loops have finished playing
+  /// (if [widget.repeat] is not set to -1 for infinite loops).
+  bool completed = false;
+
   /// Track of how many times the animation cycle has finished playing.
   int cycle = 0;
 
+  /// Indicates that the [cycle] has exceed the [widget.repeat] limit
+  bool get cycleExceed => cycle > widget.repeat;
+
+  /// Indicates both [forward] and [reverse] are `true`
+  bool get isMirror => widget.forward && widget.reverse;
+
+  /// Indicates either [forward] or [reverse] direction.
+  bool get isNotMirror => !isMirror;
+
+  /// Indicates repeat definitely
+  bool get isDefinitely => widget.repeat > -1;
+
+  /// Indicates repeat indefinitely
+  bool get isIndefinitely => !isDefinitely;
+
   /// Connects curve with the controller
   void buildAnimation() {
-    final tween = widget.forward || widget.mirror
+    final tween = widget.forward || isMirror
         ? Tween<double>(begin: 0, end: 1)
         : Tween<double>(begin: 1, end: 0);
     animation = tween.animate(
@@ -278,10 +319,19 @@ class _LoopTransitionState extends State<LoopTransition>
   /// Run the animation
   void runAnimation() {
     // Reset the animation counter
-    cycle = 0;
     if (widget.pause) {
       controller.stop();
+      if (initialized && !completed) widget.onPause?.call();
     } else {
+      if (completed) return;
+
+      if (initialized) {
+        widget.onContinue?.call();
+      } else {
+        initialized = true;
+        widget.onStart?.call();
+      }
+
       if (controller.status == AnimationStatus.reverse) {
         controller.reverse();
       } else {
@@ -290,12 +340,23 @@ class _LoopTransitionState extends State<LoopTransition>
     }
   }
 
+  void endAnimation() {
+    completed = true;
+    widget.onComplete?.call();
+  }
+
   void _handleEvents() {
     if (controller.isCompleted) {
-      if (widget.repeat > -1 && cycle > widget.repeat) return;
+      if (isNotMirror) {
+        if (isDefinitely && cycleExceed) {
+          endAnimation();
+          return;
+        }
+        widget.onCycle?.call();
+      }
       cycle++;
       Future.delayed(widget.delay, () {
-        if (widget.mirror) {
+        if (isMirror) {
           controller.reverse();
         } else {
           controller.forward(from: 0);
@@ -303,9 +364,15 @@ class _LoopTransitionState extends State<LoopTransition>
       });
     }
     if (controller.isDismissed) {
-      if (widget.repeat > -1 && cycle > widget.repeat) return;
+      if (isMirror) {
+        widget.onCycle?.call();
+        if (isDefinitely && cycleExceed) {
+          endAnimation();
+          return;
+        }
+      }
       Future.delayed(widget.delay, () {
-        if (widget.mirror) {
+        if (isMirror) {
           controller.forward();
         }
       });
@@ -337,8 +404,20 @@ class _LoopTransitionState extends State<LoopTransition>
 
   @override
   void didUpdateWidget(LoopTransition oldWidget) {
+    if (!mounted) return;
+
     // Duration might have changed, so update the [AnimationController]
     controller.duration = widget.duration;
+
+    // Restart the animation when certain prop changed
+    if (widget.repeat != oldWidget.repeat ||
+        widget.forward != oldWidget.forward ||
+        widget.reverse != oldWidget.reverse) {
+      initialized = false;
+      completed = false;
+      cycle = 0;
+      controller.reset();
+    }
 
     // Connects curve with the controller and start it.
     buildAnimation();
