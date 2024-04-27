@@ -13,13 +13,16 @@ The `loop_transition` package offers a versatile widget called `LoopTransition` 
 * Allows customization of transitions using the LoopTransitionBuilder.
 * Supports pausing and resuming playback using the pause property.
 * Provides control over animation behavior with properties like:
-  * `duration`: Animation duration for each direction (forward and backward if applicable)
-  * `curve`: Animation curve for easing the animation
-  * `delay`: Delay before the animation starts
   * `repeat`: Number of times to repeat the animation loop (-1 for infinite)
+  * `pause`: Whether to pause the animation.
+  * `mirror`: Whether the animation should play forward, then backward in a mirroring effect.
   * `reverse`: Controls the initial animation direction (forward or backward)
-  * `reverseDelay`: Delay before starting the reverse animation (in mirroring effect)
-  * `reverseDuration`: Optional duration for the backward animation (mirroring effect)
+  * `transition`: The LoopTransitionBuilder function that defines the animation behavior.
+  * `curve`: The animation curve that controls the easing of the animation.
+  * `delay`: Delay before the animation starts.
+  * `duration`: Animation duration for each direction (forward and backward if applicable).
+  * `backwardDelay`: Delay before starting the backward animation (in mirroring effect)
+  * `backwardDuration`: Optional duration for the backward animation (mirroring effect)
 * Triggers callbacks at various animation lifecycle stages:
   * `onStart`: Called only once at the very beginning of the first animation play-through.
   * `onPause`: Called whenever the animation is paused.
@@ -36,14 +39,26 @@ To read more about classes and other references used by `loop_transition`, see t
 import 'package:loop_transition/loop_transition.dart';
 ```
 
-### Create a straightforward or backward transition
+### Create a repeatable transition widget
 ```dart
 LoopTransition(
-  // Play the animation in reverse initially (optional)
-  reverse: true,
+  // Repeat the animation loop 3 times (in addition to the initial cycle)
+  repeat: 3,
 
   // Start the animation paused
   pause: true,
+
+  // Enable the mirror effect
+  mirror: true,
+
+  // Play the animation in reverse initially (optional)
+  reverse: true,
+
+  // Built-in fade transition animation (you can use a custom LoopTransitionBuilder for more complex animations)
+  transition: LoopTransition.fade,
+
+  // Use a curve to ease the animation (optional)
+  curve: Curves.easeInOut,
 
   // Delay the animation start by 1 second
   delay: const Duration(seconds: 1),
@@ -51,55 +66,11 @@ LoopTransition(
   // Set the animation duration to 500 milliseconds for each direction (forward and backward)
   duration: const Duration(milliseconds: 500),
 
-  // Use a curve to ease the animation (optional)
-  curve: Curves.easeInOut,
-
-  // Repeat the animation loop 3 times (in addition to the initial cycle)
-  repeat: 3,
-
-  // Built-in fade transition animation (you can use a custom LoopTransitionBuilder for more complex animations)
-  transition: LoopTransition.fade,
-
-  // Callbacks for various animation lifecycle events (optional)
-  onStart: () => debugPrint('Animation Started'),
-  onPause: () => debugPrint('Animation Paused'),
-  onContinue: () => debugPrint('Animation Continued'),
-  onCycle: (cycle) => debugPrint('Animation Cycle: $cycle'),
-  onComplete: () => debugPrint('Animation Completed'),
-
-  // Animate the child widget
-  child: const MyWidget(
-    text: 'This is the widget that will be animated',
-  ),
-)
-```
-
-### Create a mirroring transition widget
-```dart
-LoopTransition.mirror(
-  // Start the animation
-  pause: false,
-
-  // Delay the animation start by 1 second
-  delay: const Duration(seconds: 1),
-
-  // Set the forward animation duration to 300 milliseconds
-  duration: const Duration(milliseconds: 300),
-
   // Set a delay before the reverse animation starts (optional)
-  reverseDelay: const Duration(milliseconds: 200),
+  backwardDelay: const Duration(milliseconds: 200),
 
   // Set a different duration for the backward animation (optional)
-  reverseDuration: const Duration(milliseconds: 500),
-
-  // Use a curve to ease the animation (optional)
-  curve: Curves.easeIn,
-
-  // Repeat the entire loop (forward + backward) 2 times (in addition to the initial cycle)
-  repeat: 2,
-
-  // Built-in fade transition animation (you can use a custom LoopTransitionBuilder for more complex animations)
-  transition: LoopTransition.fade,
+  backwardDuration: const Duration(milliseconds: 500),
 
   // Callbacks for various animation lifecycle events (optional)
   onStart: () => debugPrint('Animation Started'),
@@ -107,6 +78,24 @@ LoopTransition.mirror(
   onContinue: () => debugPrint('Animation Continued'),
   onCycle: (cycle) => debugPrint('Animation Cycle: $cycle'),
   onComplete: () => debugPrint('Animation Completed'),
+
+  // Allows chain effect
+  wrapper: (child, status) {
+    if (status.isCompleted) {
+      return LoopTransition(
+        delay: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 700),
+        transition: LoopTransition.shimmer(colors: [
+          Colors.black87,
+          Colors.blue,
+          Colors.black87,
+          Colors.black87,
+        ]),
+        child: child,
+      );
+    }
+    return child;
+  },
 
   // Animate the child widget
   child: const MyWidget(

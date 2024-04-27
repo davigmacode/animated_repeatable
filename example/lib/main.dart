@@ -40,15 +40,23 @@ class MyHomePage extends StatelessWidget {
                   reverse: true,
                   child: FlutterLogo(size: 64),
                 ),
-                LoopTransition.mirror(
+                LoopTransition(
+                  mirror: true,
                   curve: Curves.easeInOut,
                   duration: const Duration(milliseconds: 1500),
-                  reverseDuration: const Duration(milliseconds: 500),
+                  backwardDuration: const Duration(milliseconds: 500),
                   transition: LoopTransition.zoom(.5, 1.2),
                   child: const Icon(
                     Icons.favorite,
                     size: 64,
                     color: Colors.red,
+                    shadows: [
+                      Shadow(
+                        blurRadius: 5.0,
+                        color: Colors.red,
+                        offset: Offset(0, 0),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -115,7 +123,6 @@ class MyHomePage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: LoopTransition(
-                    // repeat: 1,
                     curve: Curves.linear,
                     delay: const Duration(milliseconds: 1000),
                     duration: const Duration(milliseconds: 900),
@@ -128,11 +135,6 @@ class MyHomePage extends StatelessWidget {
                         Colors.white,
                       ],
                     ),
-                    // onStart: () => debugPrint('Shimmer Started'),
-                    // onPause: () => debugPrint('Shimmer Paused'),
-                    // onContinue: () => debugPrint('Shimmer Continued'),
-                    // onCycle: (cycle) => debugPrint('Shimmer Cycle: $cycle'),
-                    // onComplete: () => debugPrint('Shimmer Completed'),
                     child: DefaultTextStyle.merge(
                       style:
                           Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -195,9 +197,11 @@ class _PausableTransitionState extends State<PausableTransition> {
       child: MouseRegion(
         onEnter: (_) => toggle(true),
         onExit: (_) => toggle(false),
-        child: LoopTransition.mirror(
+        child: LoopTransition(
           pause: paused,
           repeat: 10,
+          mirror: true,
+          reverse: true,
           onStart: () => debugPrint('Animation Started'),
           onPause: () => debugPrint('Animation Paused'),
           onContinue: () => debugPrint('Animation Continued'),
@@ -207,7 +211,8 @@ class _PausableTransitionState extends State<PausableTransition> {
           transition: LoopTransition.spin,
           wrapper: (child, status) {
             if (status.isCompleted) {
-              return LoopTransition.mirror(
+              return LoopTransition(
+                mirror: true,
                 delay: const Duration(milliseconds: 300),
                 duration: const Duration(milliseconds: 700),
                 transition: LoopTransition.shimmer(colors: [
@@ -239,11 +244,12 @@ class InteractiveThreeArrows extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LoopTransition.mirror(
+    return LoopTransition(
+      mirror: true,
       curve: Curves.easeInCubic,
       delay: const Duration(milliseconds: 300),
       duration: const Duration(milliseconds: 900),
-      reverseDelay: Duration.zero,
+      backwardDelay: Duration.zero,
       transition: LoopTransition.slide(const Offset(0, -.3)),
       child: LoopTransition(
         curve: Curves.linear,

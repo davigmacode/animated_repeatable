@@ -1,3 +1,8 @@
+## 2.0.0
+
+* Reversible mirror transition.
+* Fixed the repeat behavior.
+
 ## 1.3.0
 
 * Removed LoopAnimationStatus, exposed LoopTransitionState and adjust its properties.
