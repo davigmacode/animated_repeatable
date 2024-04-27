@@ -191,7 +191,7 @@ class _PausableTransitionState extends State<PausableTransition> {
         onExit: (_) => toggle(false),
         child: LoopTransition.mirror(
           pause: paused,
-          repeat: 10,
+          repeat: 5,
           onStart: () => debugPrint('Animation Started'),
           onPause: () => debugPrint('Animation Paused'),
           onContinue: () => debugPrint('Animation Continued'),
@@ -199,8 +199,17 @@ class _PausableTransitionState extends State<PausableTransition> {
           onComplete: () => debugPrint('Animation Completed'),
           duration: const Duration(milliseconds: 1000),
           transition: LoopTransition.spin,
+          wrapper: (child, status) {
+            if (status.isCompleted) {
+              return const Icon(
+                Icons.check,
+                size: 64,
+              );
+            }
+            return child;
+          },
           child: const Icon(
-            Icons.settings,
+            Icons.refresh,
             size: 64,
           ),
         ),
