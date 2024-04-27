@@ -8,13 +8,12 @@ class LoopTransition extends StatefulWidget {
   /// Create a repeatable animated transition.
   const LoopTransition({
     super.key,
+    this.reverse = false,
     this.pause = false,
     this.delay = Duration.zero,
     this.duration = const Duration(milliseconds: 200),
     this.curve = Curves.linear,
     this.repeat = -1,
-    this.forward = true,
-    this.reverse = false,
     this.transition = LoopTransition.fade,
     this.onStart,
     this.onPause,
@@ -22,8 +21,27 @@ class LoopTransition extends StatefulWidget {
     this.onCycle,
     this.onComplete,
     required this.child,
-  })  : assert(repeat >= -1),
-        assert(forward == true || reverse == true);
+  })  : forward = !reverse,
+        assert(repeat >= -1);
+
+  /// Create a mirroring repeatable animated transition.
+  const LoopTransition.mirror({
+    super.key,
+    this.pause = false,
+    this.delay = Duration.zero,
+    this.duration = const Duration(milliseconds: 200),
+    this.curve = Curves.linear,
+    this.repeat = -1,
+    this.transition = LoopTransition.fade,
+    this.onStart,
+    this.onPause,
+    this.onContinue,
+    this.onCycle,
+    this.onComplete,
+    required this.child,
+  })  : forward = true,
+        reverse = true,
+        assert(repeat >= -1);
 
   /// When set to true, the animation playback is paused.
   /// When set to false (default), the animation plays normally
