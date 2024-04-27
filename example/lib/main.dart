@@ -115,6 +115,7 @@ class MyHomePage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: LoopTransition(
+                    // repeat: 1,
                     curve: Curves.linear,
                     delay: const Duration(milliseconds: 1000),
                     duration: const Duration(milliseconds: 900),
@@ -127,6 +128,11 @@ class MyHomePage extends StatelessWidget {
                         Colors.white,
                       ],
                     ),
+                    // onStart: () => debugPrint('Shimmer Started'),
+                    // onPause: () => debugPrint('Shimmer Paused'),
+                    // onContinue: () => debugPrint('Shimmer Continued'),
+                    // onCycle: (cycle) => debugPrint('Shimmer Cycle: $cycle'),
+                    // onComplete: () => debugPrint('Shimmer Completed'),
                     child: DefaultTextStyle.merge(
                       style:
                           Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -201,9 +207,19 @@ class _PausableTransitionState extends State<PausableTransition> {
           transition: LoopTransition.spin,
           wrapper: (child, status) {
             if (status.isCompleted) {
-              return const Icon(
-                Icons.check,
-                size: 64,
+              return LoopTransition.mirror(
+                delay: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 700),
+                transition: LoopTransition.shimmer(colors: [
+                  Colors.black87,
+                  Colors.blue,
+                  Colors.black87,
+                  Colors.black87,
+                ]),
+                child: const Icon(
+                  Icons.check,
+                  size: 64,
+                ),
               );
             }
             return child;
@@ -225,7 +241,7 @@ class InteractiveThreeArrows extends StatelessWidget {
   Widget build(BuildContext context) {
     return LoopTransition.mirror(
       curve: Curves.easeInCubic,
-      delay: const Duration(milliseconds: 500),
+      delay: const Duration(milliseconds: 300),
       duration: const Duration(milliseconds: 900),
       reverseDelay: Duration.zero,
       transition: LoopTransition.slide(const Offset(0, -.3)),
