@@ -162,7 +162,7 @@ class LoopTransition extends StatefulWidget {
   final VoidCallback? onContinue;
 
   /// Called when a complete loop iteration finishes.
-  final VoidCallback? onCycle;
+  final ValueSetter<int>? onCycle;
 
   /// Called when all specified loops have finished playing
   /// (if repeat is not set to -1 for infinite loops).
@@ -432,7 +432,7 @@ class _LoopTransitionState extends State<LoopTransition>
           endAnimation();
           return;
         }
-        widget.onCycle?.call();
+        widget.onCycle?.call(cycle);
       }
       cycle++;
       if (isMirror) {
@@ -446,7 +446,7 @@ class _LoopTransitionState extends State<LoopTransition>
     }
     if (controller.isDismissed) {
       if (isMirror) {
-        widget.onCycle?.call();
+        widget.onCycle?.call(cycle);
         if (isDefinitely && cycleExceed) {
           endAnimation();
           return;

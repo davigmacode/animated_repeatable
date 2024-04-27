@@ -1,3 +1,7 @@
+## 1.1.1
+
+* `onCycle` callback supplies the cycle value.
+
 ## 1.1.0
 
 * Added lifecycle callbacks and improved behavior.

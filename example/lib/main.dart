@@ -182,11 +182,6 @@ class _PausableTransitionState extends State<PausableTransition> {
     });
   }
 
-  void log(Object? data) {
-    // ignore: avoid_print
-    print(data);
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -197,11 +192,11 @@ class _PausableTransitionState extends State<PausableTransition> {
         child: LoopTransition.mirror(
           pause: paused,
           repeat: 10,
-          onStart: () => log('onStart'),
-          onPause: () => log('onPause'),
-          onContinue: () => log('onContinue'),
-          onCycle: () => log('onCycle'),
-          onComplete: () => log('onComplete'),
+          onStart: () => debugPrint('Animation Started'),
+          onPause: () => debugPrint('Animation Paused'),
+          onContinue: () => debugPrint('Animation Continued'),
+          onCycle: (cycle) => debugPrint('Animation Cycle: $cycle'),
+          onComplete: () => debugPrint('Animation Completed'),
           duration: const Duration(milliseconds: 1000),
           transition: LoopTransition.spin,
           child: const Icon(
