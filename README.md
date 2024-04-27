@@ -77,7 +77,7 @@ LoopTransition(
 ### Create a mirroring transition widget
 ```dart
 LoopTransition.mirror(
-  // Start the animation paused
+  // Start the animation
   pause: false,
 
   // Delay the animation start by 1 second

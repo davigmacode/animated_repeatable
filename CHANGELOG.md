@@ -1,3 +1,7 @@
+## 1.2.0
+
+* Added child wrapper builder.
+
 ## 1.1.1
 
 * `onCycle` callback supplies the cycle value.
