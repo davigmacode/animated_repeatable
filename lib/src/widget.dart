@@ -2,10 +2,33 @@ import 'dart:math';
 import 'package:flutter/widgets.dart';
 import 'types.dart';
 
-/// The LoopTransition widget provides a way to create animated
-/// transitions on a child widget that repeat a certain number of times.
+/// The LoopTransition widget provides a way to create animated transitions
+/// on a child widget that repeat a certain number of times.
+///
+/// This widget offers features like:
+///  * Pre-built transitions (fade, spin, slide, zoom, shimmer)
+///  * Customizable transitions using a LoopTransitionBuilder
+///  * Animation control through properties like duration, curve, delay, and repeat
+///  * Reversible animation direction (forward, backward, or mirroring)
+///  * Pause and resume control
+///  * Callbacks for animation lifecycle events (onStart, onPause, onContinue, onCycle, onComplete)
 class LoopTransition extends StatefulWidget {
-  /// Create a repeatable animated transition.
+  /// Creates a straightforward or backward transition.
+  ///
+  /// This constructor allows you to specify the following properties:
+  ///  * [reverse]: Controls the animation direction (forward: !reverse). Defaults to false (forward).
+  ///  * [pause]: Whether to start the animation. Defaults to false.
+  ///  * [delay]: The delay before the animation starts. Defaults to Duration.zero.
+  ///  * [duration]: The duration of the animation. Defaults to Duration(milliseconds: 200).
+  ///  * [curve]: The animation curve that controls the easing of the animation. Defaults to Curves.linear.
+  ///  * [repeat]: The number of times to repeat the animation loop. Defaults to -1 (infinite).
+  ///  * [transition]: The LoopTransitionBuilder function that defines the animation behavior. Defaults to LoopTransition.fade.
+  ///  * [onStart]: A callback function called only once at the very beginning when the animation starts playing.
+  ///  * [onPause]: A callback function called whenever the animation is paused.
+  ///  * [onContinue]: A callback function called whenever the animation is resumed after being paused.
+  ///  * [onCycle]: A callback function called every time the animation completes a single loop iteration (forward and potentially backward if reverse is true).
+  ///  * [onComplete]: A callback function called only once when all loops have finished playing (if repeat is not set to -1 for infinite loops).
+  ///  * [child]: The widget that will be animated during the transition. This is a required parameter.
   const LoopTransition({
     super.key,
     this.reverse = false,
@@ -22,14 +45,25 @@ class LoopTransition extends StatefulWidget {
     this.onComplete,
     required this.child,
   })  : forward = !reverse,
+        reverseDelay = null,
+        reverseDuration = null,
         assert(repeat >= -1);
 
-  /// Create a mirroring repeatable animated transition.
+  /// Creates a mirroring repeatable animated transition.
+  ///
+  /// This constructor allows for a mirroring effect where the animation plays forward
+  /// and then backward seamlessly within a single loop iteration. You can optionally
+  /// specify different delays and durations for the forward and backward animations using
+  /// [reverseDelay] and [reverseDuration].
+  ///
+  /// Inherits all the properties from the base LoopTransition constructor.
   const LoopTransition.mirror({
     super.key,
     this.pause = false,
     this.delay = Duration.zero,
     this.duration = const Duration(milliseconds: 200),
+    this.reverseDelay,
+    this.reverseDuration,
     this.curve = Curves.linear,
     this.repeat = -1,
     this.transition = LoopTransition.fade,
@@ -51,8 +85,27 @@ class LoopTransition extends StatefulWidget {
   /// The delay before the animation starts.
   final Duration delay;
 
+  /// Optional properties for the LoopTransition.mirror constructor.
+  ///
+  /// The delay before the animation starts playing in the reverse direction.
+  /// This allows for a slight pause between the forward and backward animations in the mirroring effect.
+  ///
+  /// Defaults to null, which means the reverse animation will use the same delay
+  /// as the forward animation specified by the [delay] property.
+  final Duration? reverseDelay;
+
   /// The [duration] of the animation.
   final Duration duration;
+
+  /// Optional properties for the LoopTransition.mirror constructor.
+  ///
+  /// The duration of the animation for the backward direction.
+  /// This allows you to specify a different duration for the backward animation
+  /// compared to the forward animation, creating an asymmetrical mirroring effect.
+  ///
+  /// Defaults to null, which means the backward animation will use the same duration
+  /// as the forward animation specified by the [duration] property.
+  final Duration? reverseDuration;
 
   /// The [curve] of the animation. By default it's [Curves.linear].
   final Curve curve;
@@ -373,13 +426,14 @@ class _LoopTransitionState extends State<LoopTransition>
         widget.onCycle?.call();
       }
       cycle++;
-      Future.delayed(widget.delay, () {
-        if (isMirror) {
-          controller.reverse();
-        } else {
-          controller.forward(from: 0);
-        }
-      });
+      if (isMirror) {
+        Future.delayed(
+          widget.reverseDelay ?? widget.delay,
+          () => controller.reverse(),
+        );
+      } else {
+        Future.delayed(widget.delay, () => controller.forward(from: 0));
+      }
     }
     if (controller.isDismissed) {
       if (isMirror) {
@@ -412,6 +466,7 @@ class _LoopTransitionState extends State<LoopTransition>
     // Create controller and register the events handler
     controller = AnimationController(
       duration: widget.duration,
+      reverseDuration: widget.reverseDuration,
       vsync: this,
     )..addListener(_handleEvents);
 
@@ -426,6 +481,7 @@ class _LoopTransitionState extends State<LoopTransition>
 
     // Duration might have changed, so update the [AnimationController]
     controller.duration = widget.duration;
+    controller.reverseDuration = widget.reverseDuration;
 
     // Restart the animation when certain prop changed
     if (widget.repeat != oldWidget.repeat ||
