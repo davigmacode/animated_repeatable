@@ -191,7 +191,7 @@ class _PausableTransitionState extends State<PausableTransition> {
         onExit: (_) => toggle(false),
         child: LoopTransition.mirror(
           pause: paused,
-          repeat: 5,
+          repeat: 10,
           onStart: () => debugPrint('Animation Started'),
           onPause: () => debugPrint('Animation Paused'),
           onContinue: () => debugPrint('Animation Continued'),

@@ -1,3 +1,7 @@
+## 1.3.0
+
+* Removed LoopAnimationStatus, exposed LoopTransitionState and adjust its properties.
+
 ## 1.2.0
 
 * Added child wrapper builder.
