@@ -355,10 +355,10 @@ class LoopTransition extends StatefulWidget {
   }
 
   @override
-  State<LoopTransition> createState() => _LoopTransitionState();
+  State<LoopTransition> createState() => LoopTransitionState();
 }
 
-class _LoopTransitionState extends State<LoopTransition>
+class LoopTransitionState extends State<LoopTransition>
     with SingleTickerProviderStateMixin {
   /// The [AnimationController] that controls the animation.
   late AnimationController controller;
@@ -366,18 +366,21 @@ class _LoopTransitionState extends State<LoopTransition>
   /// The [Animation] that is driven by the [AnimationController].
   late Animation<double> animation;
 
-  /// Track whether the animation has initially run.
-  bool initialized = false;
-
-  /// Track whether all specified loops have finished playing
-  /// (if [widget.repeat] is not set to -1 for infinite loops).
-  bool completed = false;
-
   /// Track of how many times the animation cycle has finished playing.
   int cycle = 0;
 
   /// Indicates that the [cycle] has exceed the [widget.repeat] limit
   bool get cycleExceed => cycle > widget.repeat;
+
+  /// Track whether the animation has initially run.
+  bool isInitialized = false;
+
+  /// Track whether all specified loops have finished playing
+  /// (if [widget.repeat] is not set to -1 for infinite loops).
+  bool isCompleted = false;
+
+  /// Track whether the animation is running.
+  bool get isAnimating => !widget.pause;
 
   /// Indicates both [forward] and [reverse] are `true`
   bool get isMirror => widget.forward && widget.reverse;
@@ -392,7 +395,7 @@ class _LoopTransitionState extends State<LoopTransition>
   bool get isIndefinitely => !isDefinitely;
 
   /// Connects curve with the controller
-  void buildAnimation() {
+  void _buildAnimation() {
     final tween = widget.forward || isMirror
         ? Tween<double>(begin: 0, end: 1)
         : Tween<double>(begin: 1, end: 0);
@@ -405,18 +408,18 @@ class _LoopTransitionState extends State<LoopTransition>
   }
 
   /// Run the animation
-  void runAnimation() {
+  void _runAnimation() {
     // Reset the animation counter
     if (widget.pause) {
       controller.stop();
-      if (initialized && !completed) widget.onPause?.call();
+      if (isInitialized && !isCompleted) widget.onPause?.call();
     } else {
-      if (completed) return;
+      if (isCompleted) return;
 
-      if (initialized) {
+      if (isInitialized) {
         widget.onContinue?.call();
       } else {
-        initialized = true;
+        isInitialized = true;
         widget.onStart?.call();
       }
 
@@ -429,18 +432,19 @@ class _LoopTransitionState extends State<LoopTransition>
   }
 
   /// End the animation
-  void endAnimation() {
+  void _endAnimation() {
     setState(() {
-      completed = true;
+      isCompleted = true;
     });
     widget.onComplete?.call();
   }
 
+  /// Handle the animation events
   void _handleEvents() {
     if (controller.isCompleted) {
       if (isNotMirror) {
         if (isDefinitely && cycleExceed) {
-          endAnimation();
+          _endAnimation();
           return;
         }
         widget.onCycle?.call(cycle);
@@ -459,7 +463,7 @@ class _LoopTransitionState extends State<LoopTransition>
       if (isMirror) {
         widget.onCycle?.call(cycle);
         if (isDefinitely && cycleExceed) {
-          endAnimation();
+          _endAnimation();
           return;
         }
       }
@@ -491,8 +495,8 @@ class _LoopTransitionState extends State<LoopTransition>
     )..addListener(_handleEvents);
 
     // Connects curve with the controller and start it.
-    buildAnimation();
-    runAnimation();
+    _buildAnimation();
+    _runAnimation();
   }
 
   @override
@@ -507,16 +511,16 @@ class _LoopTransitionState extends State<LoopTransition>
     if (widget.repeat != oldWidget.repeat ||
         widget.forward != oldWidget.forward ||
         widget.reverse != oldWidget.reverse) {
-      initialized = false;
-      completed = false;
+      isInitialized = false;
+      isCompleted = false;
       cycle = 0;
       controller.reset();
     }
 
     if (widget.pause != oldWidget.pause) {
       // Connects curve with the controller and start it.
-      buildAnimation();
-      runAnimation();
+      _buildAnimation();
+      _runAnimation();
     }
 
     super.didUpdateWidget(oldWidget);
@@ -530,15 +534,7 @@ class _LoopTransitionState extends State<LoopTransition>
 
   @override
   Widget build(BuildContext context) {
-    final status = LoopAnimationStatus(
-      isInitialized: initialized,
-      isAnimating: !widget.pause,
-      isCompleted: completed,
-      isDefinitely: widget.repeat > -1,
-      isMirror: widget.forward && widget.reverse,
-      cycle: cycle,
-    );
-    final child = widget.wrapper?.call(widget.child, status) ?? widget.child;
+    final child = widget.wrapper?.call(widget.child, this) ?? widget.child;
     return widget.transition(child, animation);
   }
 }
