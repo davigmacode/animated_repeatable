@@ -442,14 +442,14 @@ class LoopTransitionState extends State<LoopTransition>
   /// Handle the animation events
   void _handleEvents() {
     if (controller.isCompleted) {
+      cycle++;
       if (isNotMirror) {
+        widget.onCycle?.call(cycle);
         if (isDefinitely && cycleExceed) {
           _endAnimation();
           return;
         }
-        widget.onCycle?.call(cycle);
       }
-      cycle++;
       if (isMirror) {
         Future.delayed(
           widget.reverseDelay ?? widget.delay,
@@ -459,7 +459,7 @@ class LoopTransitionState extends State<LoopTransition>
         Future.delayed(widget.delay, () => controller.forward(from: 0));
       }
     }
-    if (controller.isDismissed) {
+    if (isInitialized && controller.isDismissed) {
       if (isMirror) {
         widget.onCycle?.call(cycle);
         if (isDefinitely && cycleExceed) {
@@ -517,11 +517,9 @@ class LoopTransitionState extends State<LoopTransition>
       controller.reset();
     }
 
-    if (widget.pause != oldWidget.pause) {
-      // Connects curve with the controller and start it.
-      _buildAnimation();
-      _runAnimation();
-    }
+    // Connects curve with the controller and start it.
+    _buildAnimation();
+    _runAnimation();
 
     super.didUpdateWidget(oldWidget);
   }
