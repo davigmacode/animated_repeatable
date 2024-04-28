@@ -412,9 +412,7 @@ class LoopTransitionState extends State<LoopTransition>
 
   /// End the animation
   void _endAnimation() {
-    setState(() {
-      isCompleted = true;
-    });
+    setState(() => isCompleted = true);
     widget.onComplete?.call();
   }
 
@@ -422,19 +420,17 @@ class LoopTransitionState extends State<LoopTransition>
   void _handleEvents() {
     if (controller.isCompleted) {
       cycle++;
-      if (isNotMirror) {
-        widget.onCycle?.call(cycle);
-        if (isDefinitely && cycleExceed) {
-          _endAnimation();
-          return;
-        }
-      }
       if (isMirror) {
         Future.delayed(
           widget.backwardDelay ?? widget.delay,
           () => controller.reverse(),
         );
       } else {
+        widget.onCycle?.call(cycle);
+        if (isDefinitely && cycleExceed) {
+          _endAnimation();
+          return;
+        }
         Future.delayed(widget.delay, () => controller.forward(from: 0));
       }
     }
@@ -445,12 +441,8 @@ class LoopTransitionState extends State<LoopTransition>
           _endAnimation();
           return;
         }
+        Future.delayed(widget.delay, () => controller.forward());
       }
-      Future.delayed(widget.delay, () {
-        if (isMirror) {
-          controller.forward();
-        }
-      });
     }
     setState(() {});
   }
