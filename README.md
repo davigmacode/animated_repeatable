@@ -15,6 +15,7 @@ The `loop_transition` package offers a versatile widget called `LoopTransition` 
 * Provides control over animation behavior with properties like:
   * `repeat`: Number of times to repeat the animation loop (-1 for infinite)
   * `pause`: Whether to pause the animation.
+  * `continuity`: Controls whether the animation should maintain continuity when paused.
   * `mirror`: Whether the animation should play forward, then backward in a mirroring effect.
   * `reverse`: Controls the initial animation direction (forward or backward)
   * `transition`: The LoopTransitionBuilder function that defines the animation behavior.
@@ -45,8 +46,11 @@ LoopTransition(
   // Repeat the animation loop 3 times (in addition to the initial cycle)
   repeat: 3,
 
-  // Start the animation paused
-  pause: true,
+  // Start the animation
+  pause: false,
+
+  // When [pause] set to `true` then `false`, reset the animation to continue
+  continuity: false,
 
   // Enable the mirror effect
   mirror: true,

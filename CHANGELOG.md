@@ -1,3 +1,7 @@
+## 2.1.0
+
+* Add option to maintain continuity when pause then resume.
+
 ## 2.0.0
 
 * Reversible mirror transition.
