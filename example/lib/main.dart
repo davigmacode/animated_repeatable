@@ -212,9 +212,12 @@ class _PausableTransitionState extends State<PausableTransition> {
           wrapper: (child, status) {
             if (status.isCompleted) {
               return LoopTransition(
+                pause: paused,
                 mirror: true,
+                continuity: false,
                 delay: const Duration(milliseconds: 300),
                 duration: const Duration(milliseconds: 700),
+                backwardDuration: const Duration(milliseconds: 500),
                 transition: LoopTransition.shimmer(colors: [
                   Colors.black87,
                   Colors.blue,

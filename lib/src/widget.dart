@@ -21,6 +21,8 @@ class LoopTransition extends StatefulWidget {
   ///
   /// [pause]: Whether to start the animation. Defaults to `false`.
   ///
+  /// [continuity]: Controls whether the animation should maintain continuity when paused.
+  ///
   /// [mirror]: Whether the animation should play forward, then backward in a mirroring effect.
   /// Defaults to false.
   ///
@@ -61,6 +63,7 @@ class LoopTransition extends StatefulWidget {
     super.key,
     this.repeat = -1,
     this.pause = false,
+    this.continuity = true,
     this.mirror = false,
     this.reverse = false,
     this.transition = LoopTransition.fade,
@@ -96,6 +99,9 @@ class LoopTransition extends StatefulWidget {
   /// When set to `false` (default), the animation plays normally
   /// according to the defined loop count [repeat].
   final bool pause;
+
+  /// Controls whether the animation should maintain continuity when paused.
+  final bool continuity;
 
   /// Defines whether the animation should play forward, then backward in a mirroring effect.
   final bool mirror;
@@ -397,6 +403,10 @@ class LoopTransitionState extends State<LoopTransition>
 
       if (isInitialized) {
         widget.onContinue?.call();
+        if (!widget.continuity) {
+          controller.forward(from: 0);
+          return;
+        }
       } else {
         isInitialized = true;
         widget.onStart?.call();
@@ -480,6 +490,7 @@ class LoopTransitionState extends State<LoopTransition>
 
     // Restart the animation when certain prop changed
     if (widget.repeat != oldWidget.repeat ||
+        widget.continuity != oldWidget.continuity ||
         widget.mirror != oldWidget.mirror ||
         widget.reverse != oldWidget.reverse) {
       isInitialized = false;
