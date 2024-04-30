@@ -208,8 +208,8 @@ class _PausableTransitionState extends State<PausableTransition> {
       transition: AnimatedRepeatable.spin,
       reverseDuration: const Duration(milliseconds: 300),
       reverseTransition: AnimatedRepeatable.shakeX,
-      wrapper: (child, status) {
-        if (status.isCompleted) {
+      wrapper: (child, state) {
+        if (state.isCompleted) {
           return AnimatedRepeatable(
             pause: paused,
             mirror: true,

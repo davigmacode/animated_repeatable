@@ -1,3 +1,7 @@
+## 1.1.1
+
+* Fixed cycle not increase when onCycle not defined.
+
 ## 1.1.0
 
 * Improved builder parameter.
