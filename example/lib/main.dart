@@ -182,9 +182,11 @@ class PausableTransition extends StatefulWidget {
 }
 
 class _PausableTransitionState extends State<PausableTransition> {
+  final key = GlobalKey<LoopTransitionState>();
+
   bool paused = false;
 
-  void toggle([bool? value]) {
+  void onHover([bool? value]) {
     setState(() {
       paused = value ?? !paused;
     });
@@ -192,50 +194,53 @@ class _PausableTransitionState extends State<PausableTransition> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: toggle,
+    return LoopTransition(
+      key: key,
+      pause: paused,
+      repeat: 1,
+      mirror: true,
+      reverse: true,
+      onStart: () => debugPrint('Animation Started'),
+      onPause: () => debugPrint('Animation Paused'),
+      onContinue: () => debugPrint('Animation Continued'),
+      onCycle: (cycle) => debugPrint('Animation Cycle: $cycle'),
+      onComplete: () => debugPrint('Animation Completed'),
+      duration: const Duration(milliseconds: 1000),
+      transition: LoopTransition.spin,
+      wrapper: (child, status) {
+        if (status.isCompleted) {
+          return LoopTransition(
+            pause: paused,
+            mirror: true,
+            continuity: false,
+            delay: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 700),
+            backwardDuration: const Duration(milliseconds: 500),
+            transition: LoopTransition.shimmer(colors: [
+              Colors.black87,
+              Colors.blue,
+              Colors.black87,
+              Colors.black87,
+            ]),
+            child: InkResponse(
+              onTap: () {
+                key.currentState?.play(reset: true);
+              },
+              child: const Icon(
+                Icons.check,
+                size: 64,
+              ),
+            ),
+          );
+        }
+        return child;
+      },
       child: MouseRegion(
-        onEnter: (_) => toggle(true),
-        onExit: (_) => toggle(false),
-        child: LoopTransition(
-          pause: paused,
-          repeat: 10,
-          mirror: true,
-          reverse: true,
-          onStart: () => debugPrint('Animation Started'),
-          onPause: () => debugPrint('Animation Paused'),
-          onContinue: () => debugPrint('Animation Continued'),
-          onCycle: (cycle) => debugPrint('Animation Cycle: $cycle'),
-          onComplete: () => debugPrint('Animation Completed'),
-          duration: const Duration(milliseconds: 1000),
-          transition: LoopTransition.spin,
-          wrapper: (child, status) {
-            if (status.isCompleted) {
-              return LoopTransition(
-                pause: paused,
-                mirror: true,
-                continuity: false,
-                delay: const Duration(milliseconds: 300),
-                duration: const Duration(milliseconds: 700),
-                backwardDuration: const Duration(milliseconds: 500),
-                transition: LoopTransition.shimmer(colors: [
-                  Colors.black87,
-                  Colors.blue,
-                  Colors.black87,
-                  Colors.black87,
-                ]),
-                child: const Icon(
-                  Icons.check,
-                  size: 64,
-                ),
-              );
-            }
-            return child;
-          },
-          child: const Icon(
-            Icons.refresh,
-            size: 64,
-          ),
+        onEnter: (_) => onHover(true),
+        onExit: (_) => onHover(false),
+        child: const Icon(
+          Icons.refresh,
+          size: 64,
         ),
       ),
     );
