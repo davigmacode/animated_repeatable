@@ -4,7 +4,7 @@ import 'widget.dart';
 /// Used within the LoopTransition widget to specify
 /// the animation function that controls how the child widget
 /// is transformed during the animation cycle.
-typedef LoopTransitionBuilder = Widget Function(
+typedef AnimatedRepeatableTransitionBuilder = Widget Function(
   Widget child,
   Animation<double> animation,
 );
@@ -12,9 +12,9 @@ typedef LoopTransitionBuilder = Widget Function(
 /// This typedef defines a function signature used
 /// within the LoopTransition widget. It's essentially a function
 /// that builds the animated widget based on the provided parameters.
-typedef LoopTransitionWrapperBuilder = Widget Function(
+typedef AnimatedRepeatableWrapperBuilder = Widget Function(
   Widget child,
-  LoopTransitionState status,
+  AnimatedRepeatableState status,
 );
 
 /// Provides a way to dynamically position a gradient

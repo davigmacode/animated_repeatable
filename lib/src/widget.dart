@@ -2,17 +2,17 @@ import 'dart:math';
 import 'package:flutter/widgets.dart';
 import 'types.dart';
 
-/// The LoopTransition widget provides a way to create animated transitions
+/// The AnimatedRepeatable widget provides a way to create animated transitions
 /// on a child widget that repeat a certain number of times.
 ///
 /// This widget offers features like:
 /// * Pre-built transitions (fade, spin, slide, zoom, shimmer)
-/// * Customizable transitions using a LoopTransitionBuilder
+/// * Customizable transitions using a AnimatedRepeatableTransitionBuilder
 /// * Animation control through properties like `duration`, `curve`, `delay`, and `repeat`
 /// * Reversible animation direction (forward, backward, or mirroring)
 /// * Pause and resume control
 /// * Callbacks for animation lifecycle events (onStart, onPause, onContinue, onCycle, onComplete)
-class LoopTransition extends StatefulWidget {
+class AnimatedRepeatable extends StatefulWidget {
   /// Creates a repeatable transition widget.
   ///
   /// This constructor allows you to specify the following properties:
@@ -28,8 +28,8 @@ class LoopTransition extends StatefulWidget {
   ///
   /// [reverse]: Whether the animation plays backward initially. Defaults to `false`.
   ///
-  /// [transition]: The LoopTransitionBuilder function that defines the animation behavior.
-  /// Defaults to LoopTransition.fade.
+  /// [transition]: The AnimatedRepeatableTransitionBuilder function that defines the animation behavior.
+  /// Defaults to AnimatedRepeatable.fade.
   ///
   /// [curve]: The animation curve that controls the easing of the animation.
   /// Defaults to `Curves.linear`.
@@ -59,14 +59,14 @@ class LoopTransition extends StatefulWidget {
   ///
   /// [child]: The widget that will be animated during the transition.
   /// This is a required parameter.
-  const LoopTransition({
+  const AnimatedRepeatable({
     super.key,
     this.repeat = -1,
     this.pause = false,
     this.continuity = true,
     this.mirror = false,
     this.reverse = false,
-    this.transition = LoopTransition.fade,
+    this.transition = AnimatedRepeatable.fade,
     this.curve = Curves.linear,
     this.delay = Duration.zero,
     this.duration = const Duration(milliseconds: 200),
@@ -110,9 +110,9 @@ class LoopTransition extends StatefulWidget {
   final bool reverse;
 
   /// Defines the type of animation applied to the child widget.
-  /// By default, it uses a fade transition (LoopTransition.fade).
+  /// By default, it uses a fade transition (AnimatedRepeatable.fade).
   /// You can potentially provide your own custom transition function here.
-  final LoopTransitionBuilder transition;
+  final AnimatedRepeatableTransitionBuilder transition;
 
   /// The [curve] of the animation. By default it's [Curves.linear].
   final Curve curve;
@@ -159,7 +159,7 @@ class LoopTransition extends StatefulWidget {
   /// It allows you to control how the child widget
   /// is transformed based on the animation's progress
   /// and current state (LoopAnimationStatus).
-  final LoopTransitionWrapperBuilder? wrapper;
+  final AnimatedRepeatableWrapperBuilder? wrapper;
 
   /// The mandatory widget that will be animated during the transition.
   final Widget child;
@@ -185,7 +185,7 @@ class LoopTransition extends StatefulWidget {
   }
 
   /// Provides a convenient way to create basic sliding animations
-  /// for your [child] widget within the LoopTransition framework.
+  /// for your [child] widget within the AnimatedRepeatable framework.
   /// Control the direction and distance of the slide using the [to] and [from] offsets.
   ///
   /// **[to]** (required, Offset) : Defines the ending position of
@@ -197,7 +197,7 @@ class LoopTransition extends StatefulWidget {
   /// Defines the starting position of the slide animation relative to
   /// the child widget's original location. Defaults to Offset.zero,
   /// which means the animation starts with the child widget in its original position.
-  static LoopTransitionBuilder slide(
+  static AnimatedRepeatableTransitionBuilder slide(
     Offset to, [
     Offset from = Offset.zero,
   ]) {
@@ -223,7 +223,7 @@ class LoopTransition extends StatefulWidget {
   /// **[to]** (optional, double) : Defines the ending scale of the [child] widget
   /// during the animation cycle. Defaults to 1.0, which means the [child] widget ends up
   /// at its original size.
-  static LoopTransitionBuilder zoom([
+  static AnimatedRepeatableTransitionBuilder zoom([
     double from = 0,
     double to = 1,
   ]) {
@@ -268,7 +268,7 @@ class LoopTransition extends StatefulWidget {
   /// **[blendMode]** (optional, BlendMode) : Determines how the shimmer gradient
   /// is blended with the child widget. Defaults to BlendMode.srcATop,
   /// which places the source color over the destination color.
-  static LoopTransitionBuilder shimmer({
+  static AnimatedRepeatableTransitionBuilder shimmer({
     required List<Color> colors,
     List<double>? stops,
     AlignmentGeometry begin = Alignment.topLeft,
@@ -310,7 +310,7 @@ class LoopTransition extends StatefulWidget {
   /// the maximum offset of the shaking movement. Defaults to `3.0`,
   /// which creates a moderate shaking effect. Higher values will
   /// result in more pronounced shaking.
-  static LoopTransitionBuilder shake({
+  static AnimatedRepeatableTransitionBuilder shake({
     Axis direction = Axis.horizontal,
     double distance = 5,
   }) {
@@ -340,10 +340,10 @@ class LoopTransition extends StatefulWidget {
   }
 
   @override
-  State<LoopTransition> createState() => LoopTransitionState();
+  State<AnimatedRepeatable> createState() => AnimatedRepeatableState();
 }
 
-class LoopTransitionState extends State<LoopTransition>
+class AnimatedRepeatableState extends State<AnimatedRepeatable>
     with SingleTickerProviderStateMixin {
   /// The [AnimationController] that controls the animation.
   late AnimationController controller;
@@ -522,7 +522,7 @@ class LoopTransitionState extends State<LoopTransition>
   }
 
   @override
-  void didUpdateWidget(LoopTransition oldWidget) {
+  void didUpdateWidget(AnimatedRepeatable oldWidget) {
     if (!mounted) {
       super.didUpdateWidget(oldWidget);
       return;
