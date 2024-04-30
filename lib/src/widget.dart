@@ -7,7 +7,7 @@ import 'types.dart';
 ///
 /// This widget offers features like:
 /// * Pre-built transitions (`fade`, `spin`, `slide`, `zoom`, `shimmer`)
-/// * Customizable transitions using a [AnimatedRepeatableTransitionBuilder]
+/// * Customizable transitions using a [AnimatedRepeatableBuilder]
 /// * Animation control through properties like `duration`, `curve`, `delay`, and `repeat`
 /// * Reversible animation direction (forward, backward, or mirroring)
 /// * Pause and resume control
@@ -28,7 +28,7 @@ class AnimatedRepeatable extends StatefulWidget {
   ///
   /// [reverse]: Whether the animation plays backward initially. Defaults to `false`.
   ///
-  /// [transition]: The [AnimatedRepeatableTransitionBuilder] function that defines the animation behavior.
+  /// [transition]: The [AnimatedRepeatableBuilder] function that defines the animation behavior.
   /// Defaults to [AnimatedRepeatable.fade].
   ///
   /// [curve]: The animation curve that controls the easing of the animation.
@@ -120,7 +120,7 @@ class AnimatedRepeatable extends StatefulWidget {
   /// Defines the type of animation applied to the child widget.
   /// By default, it uses a fade transition (AnimatedRepeatable.fade).
   /// You can potentially provide your own custom transition function here.
-  final AnimatedRepeatableTransitionBuilder transition;
+  final AnimatedRepeatableBuilder transition;
 
   /// The [curve] of the animation. By default it's [Curves.linear].
   final Curve curve;
@@ -139,7 +139,7 @@ class AnimatedRepeatable extends StatefulWidget {
   ///
   /// Defaults to `null`, which means the backward animation will use the same
   /// transition function as the forward animation specified by the [transition] property.
-  final AnimatedRepeatableTransitionBuilder? reverseTransition;
+  final AnimatedRepeatableBuilder? reverseTransition;
 
   /// The curve to use in the backward direction.
   /// (only applicable if [mirror] is `true`).
@@ -184,27 +184,27 @@ class AnimatedRepeatable extends StatefulWidget {
   /// It allows you to control how the child widget
   /// is transformed based on the animation's progress
   /// and current state (LoopAnimationStatus).
-  final AnimatedRepeatableWrapperBuilder? wrapper;
+  final AnimatedRepeatableBuilder? wrapper;
 
   /// The mandatory widget that will be animated during the transition.
   final Widget child;
 
   /// Creates a smooth fading effect on the child widget during the animation cycle.
   static const fade = _fade;
-  static Widget _fade(Widget child, Animation<double> animation) {
+  static Widget _fade(Widget child, AnimatedRepeatableState state) {
     return FadeTransition(
       key: ValueKey<Key?>(child.key),
-      opacity: animation,
+      opacity: state.animation,
       child: child,
     );
   }
 
   /// Animates [child] by rotating them around a central point.
   static const spin = _spin;
-  static Widget _spin(Widget child, Animation<double> animation) {
+  static Widget _spin(Widget child, AnimatedRepeatableState state) {
     return RotationTransition(
       key: ValueKey<Key?>(child.key),
-      turns: animation,
+      turns: state.animation,
       child: child,
     );
   }
@@ -222,18 +222,18 @@ class AnimatedRepeatable extends StatefulWidget {
   /// Defines the starting position of the slide animation relative to
   /// the child widget's original location. Defaults to Offset.zero,
   /// which means the animation starts with the child widget in its original position.
-  static AnimatedRepeatableTransitionBuilder slide(
+  static AnimatedRepeatableBuilder slide(
     Offset to, [
     Offset from = Offset.zero,
   ]) {
-    return (child, final animation) {
+    return (child, final state) {
       final tween = Tween<Offset>(
         begin: from,
         end: to,
       );
 
       return SlideTransition(
-        position: tween.animate(animation),
+        position: tween.animate(state.animation),
         child: child,
       );
     };
@@ -248,18 +248,18 @@ class AnimatedRepeatable extends StatefulWidget {
   /// **[to]** (optional, double) : Defines the ending scale of the [child] widget
   /// during the animation cycle. Defaults to 1.0, which means the [child] widget ends up
   /// at its original size.
-  static AnimatedRepeatableTransitionBuilder zoom([
+  static AnimatedRepeatableBuilder zoom([
     double from = 0,
     double to = 1,
   ]) {
-    return (Widget child, Animation<double> animation) {
+    return (child, final state) {
       final tween = Tween<double>(
         begin: from,
         end: to,
       );
       return ScaleTransition(
         key: ValueKey(child.key),
-        scale: tween.animate(animation),
+        scale: tween.animate(state.animation),
         child: child,
       );
     };
@@ -293,7 +293,7 @@ class AnimatedRepeatable extends StatefulWidget {
   /// **[blendMode]** (optional, BlendMode) : Determines how the shimmer gradient
   /// is blended with the child widget. Defaults to BlendMode.srcATop,
   /// which places the source color over the destination color.
-  static AnimatedRepeatableTransitionBuilder shimmer({
+  static AnimatedRepeatableBuilder shimmer({
     required List<Color> colors,
     List<double>? stops,
     AlignmentGeometry begin = Alignment.topLeft,
@@ -302,7 +302,7 @@ class AnimatedRepeatable extends StatefulWidget {
     AxisDirection direction = AxisDirection.right,
     BlendMode blendMode = BlendMode.srcATop,
   }) {
-    return (child, final animation) {
+    return (child, final state) {
       final gradient = LinearGradient(
         colors: colors,
         stops: stops,
@@ -311,7 +311,7 @@ class AnimatedRepeatable extends StatefulWidget {
         tileMode: tileMode,
         transform: GradientSlide(
           direction: direction,
-          progress: animation.value,
+          progress: state.animation.value,
         ),
       );
       return ShaderMask(
@@ -335,13 +335,13 @@ class AnimatedRepeatable extends StatefulWidget {
   /// the maximum offset of the shaking movement. Defaults to `3.0`,
   /// which creates a moderate shaking effect. Higher values will
   /// result in more pronounced shaking.
-  static AnimatedRepeatableTransitionBuilder shake({
+  static AnimatedRepeatableBuilder shake({
     Axis direction = Axis.horizontal,
     double distance = 5,
   }) {
-    return (child, final animation) {
+    return (child, final state) {
       final isHorizontal = direction == Axis.horizontal;
-      final d = sin(animation.value * pi * distance) * distance;
+      final d = sin(state.animation.value * pi * distance) * distance;
       return Transform.translate(
         offset: Offset(
           isHorizontal ? d : 0.0,
@@ -354,14 +354,14 @@ class AnimatedRepeatable extends StatefulWidget {
 
   /// Animates [child] by shake them along the horizontal axis.
   static const shakeX = _shakeX;
-  static Widget _shakeX(Widget child, Animation<double> animation) {
-    return shake(direction: Axis.horizontal)(child, animation);
+  static Widget _shakeX(Widget child, AnimatedRepeatableState state) {
+    return shake(direction: Axis.horizontal)(child, state);
   }
 
   /// Animates [child] by shake them along the vertical axis.
   static const shakeY = _shakeY;
-  static Widget _shakeY(Widget child, Animation<double> animation) {
-    return shake(direction: Axis.vertical)(child, animation);
+  static Widget _shakeY(Widget child, AnimatedRepeatableState state) {
+    return shake(direction: Axis.vertical)(child, state);
   }
 
   /// The [AnimatedRepeatableState] from the closest instance of
@@ -383,7 +383,7 @@ class AnimatedRepeatableState extends State<AnimatedRepeatable>
   late Animation<double> animation;
 
   /// The effective transition builder should use.
-  AnimatedRepeatableTransitionBuilder get _transition {
+  AnimatedRepeatableBuilder get _transition {
     return controller.status == AnimationStatus.reverse
         ? widget.reverseTransition ?? widget.transition
         : widget.transition;
@@ -594,6 +594,6 @@ class AnimatedRepeatableState extends State<AnimatedRepeatable>
   @override
   Widget build(BuildContext context) {
     final child = widget.wrapper?.call(widget.child, this) ?? widget.child;
-    return _transition(child, animation);
+    return _transition(child, this);
   }
 }

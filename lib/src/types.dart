@@ -1,18 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'widget.dart';
 
-/// Used within the AnimatedRepeatable widget to specify
+/// Used within the [AnimatedRepeatable] widget to specify
 /// the animation function that controls how the child widget
 /// is transformed during the animation cycle.
-typedef AnimatedRepeatableTransitionBuilder = Widget Function(
-  Widget child,
-  Animation<double> animation,
-);
-
-/// This typedef defines a function signature used
-/// within the AnimatedRepeatable widget. It's essentially a function
-/// that builds the animated widget based on the provided parameters.
-typedef AnimatedRepeatableWrapperBuilder = Widget Function(
+typedef AnimatedRepeatableBuilder = Widget Function(
   Widget child,
   AnimatedRepeatableState state,
 );
