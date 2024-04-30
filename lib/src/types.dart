@@ -14,7 +14,7 @@ typedef AnimatedRepeatableTransitionBuilder = Widget Function(
 /// that builds the animated widget based on the provided parameters.
 typedef AnimatedRepeatableWrapperBuilder = Widget Function(
   Widget child,
-  AnimatedRepeatableState status,
+  AnimatedRepeatableState state,
 );
 
 /// Provides a way to dynamically position a gradient

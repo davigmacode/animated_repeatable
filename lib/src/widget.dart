@@ -364,6 +364,12 @@ class AnimatedRepeatable extends StatefulWidget {
     return shake(direction: Axis.vertical)(child, animation);
   }
 
+  /// The [AnimatedRepeatableState] from the closest instance of
+  /// this class that encloses the given context.
+  static AnimatedRepeatableState? of(BuildContext context) {
+    return context.findAncestorStateOfType<AnimatedRepeatableState>();
+  }
+
   @override
   State<AnimatedRepeatable> createState() => AnimatedRepeatableState();
 }
@@ -587,7 +593,6 @@ class AnimatedRepeatableState extends State<AnimatedRepeatable>
 
   @override
   Widget build(BuildContext context) {
-    // TODO: builder constructor
     final child = widget.wrapper?.call(widget.child, this) ?? widget.child;
     return _transition(child, animation);
   }
