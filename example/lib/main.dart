@@ -44,7 +44,7 @@ class MyHomePage extends StatelessWidget {
                   mirror: true,
                   curve: Curves.easeInOut,
                   duration: const Duration(milliseconds: 1500),
-                  backwardDuration: const Duration(milliseconds: 500),
+                  reverseDuration: const Duration(milliseconds: 500),
                   transition: AnimatedRepeatable.zoom(.5, 1.2),
                   child: const Icon(
                     Icons.favorite,
@@ -197,9 +197,8 @@ class _PausableTransitionState extends State<PausableTransition> {
     return AnimatedRepeatable(
       key: key,
       pause: paused,
-      repeat: 1,
+      repeat: 2,
       mirror: true,
-      reverse: true,
       onStart: () => debugPrint('Animation Started'),
       onPause: () => debugPrint('Animation Paused'),
       onContinue: () => debugPrint('Animation Continued'),
@@ -207,6 +206,8 @@ class _PausableTransitionState extends State<PausableTransition> {
       onComplete: () => debugPrint('Animation Completed'),
       duration: const Duration(milliseconds: 1000),
       transition: AnimatedRepeatable.spin,
+      reverseDuration: const Duration(milliseconds: 300),
+      reverseTransition: AnimatedRepeatable.shakeX,
       wrapper: (child, status) {
         if (status.isCompleted) {
           return AnimatedRepeatable(
@@ -215,7 +216,7 @@ class _PausableTransitionState extends State<PausableTransition> {
             continuity: false,
             delay: const Duration(milliseconds: 300),
             duration: const Duration(milliseconds: 700),
-            backwardDuration: const Duration(milliseconds: 500),
+            reverseDuration: const Duration(milliseconds: 500),
             transition: AnimatedRepeatable.shimmer(colors: [
               Colors.black87,
               Colors.blue,
@@ -257,7 +258,7 @@ class InteractiveThreeArrows extends StatelessWidget {
       curve: Curves.easeInCubic,
       delay: const Duration(milliseconds: 300),
       duration: const Duration(milliseconds: 900),
-      backwardDelay: Duration.zero,
+      reverseDelay: Duration.zero,
       transition: AnimatedRepeatable.slide(const Offset(0, -.3)),
       child: AnimatedRepeatable(
         curve: Curves.linear,

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'widget.dart';
 
-/// Used within the LoopTransition widget to specify
+/// Used within the AnimatedRepeatable widget to specify
 /// the animation function that controls how the child widget
 /// is transformed during the animation cycle.
 typedef AnimatedRepeatableTransitionBuilder = Widget Function(
@@ -10,7 +10,7 @@ typedef AnimatedRepeatableTransitionBuilder = Widget Function(
 );
 
 /// This typedef defines a function signature used
-/// within the LoopTransition widget. It's essentially a function
+/// within the AnimatedRepeatable widget. It's essentially a function
 /// that builds the animated widget based on the provided parameters.
 typedef AnimatedRepeatableWrapperBuilder = Widget Function(
   Widget child,

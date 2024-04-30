@@ -6,12 +6,12 @@ import 'types.dart';
 /// on a child widget that repeat a certain number of times.
 ///
 /// This widget offers features like:
-/// * Pre-built transitions (fade, spin, slide, zoom, shimmer)
-/// * Customizable transitions using a AnimatedRepeatableTransitionBuilder
+/// * Pre-built transitions (`fade`, `spin`, `slide`, `zoom`, `shimmer`)
+/// * Customizable transitions using a [AnimatedRepeatableTransitionBuilder]
 /// * Animation control through properties like `duration`, `curve`, `delay`, and `repeat`
 /// * Reversible animation direction (forward, backward, or mirroring)
 /// * Pause and resume control
-/// * Callbacks for animation lifecycle events (onStart, onPause, onContinue, onCycle, onComplete)
+/// * Callbacks for animation lifecycle events (`onStart`, `onPause`, `onContinue`, `onCycle`, `onComplete`)
 class AnimatedRepeatable extends StatefulWidget {
   /// Creates a repeatable transition widget.
   ///
@@ -28,8 +28,8 @@ class AnimatedRepeatable extends StatefulWidget {
   ///
   /// [reverse]: Whether the animation plays backward initially. Defaults to `false`.
   ///
-  /// [transition]: The AnimatedRepeatableTransitionBuilder function that defines the animation behavior.
-  /// Defaults to AnimatedRepeatable.fade.
+  /// [transition]: The [AnimatedRepeatableTransitionBuilder] function that defines the animation behavior.
+  /// Defaults to [AnimatedRepeatable.fade].
   ///
   /// [curve]: The animation curve that controls the easing of the animation.
   /// Defaults to `Curves.linear`.
@@ -38,9 +38,15 @@ class AnimatedRepeatable extends StatefulWidget {
   ///
   /// [duration]: The duration of the animation. Defaults to `Duration(milliseconds: 200)`.
   ///
-  /// [backwardDelay]: The delay before the backward animation starts. Defaults to [delay] value.
+  /// [reverseTransition]: Defines the type of animation applied to the child widget
+  /// for the backward direction (only applicable if [mirror] is `true`). Defaults to [transition] value.
   ///
-  /// [backwardDuration]: The duration of the backward animation. Defaults to [duration] value.
+  /// [reverseCurve]: The curve to use in the reverse direction.
+  /// (only applicable if [mirror] is `true`). Defaults to [curve] value.
+  ///
+  /// [reverseDelay]: The delay before the backward animation starts. Defaults to [delay] value.
+  ///
+  /// [reverseDuration]: The duration of the backward animation. Defaults to [duration] value.
   ///
   /// [onStart]: A callback function called only once at the very beginning when the animation starts playing.
   ///
@@ -70,8 +76,10 @@ class AnimatedRepeatable extends StatefulWidget {
     this.curve = Curves.linear,
     this.delay = Duration.zero,
     this.duration = const Duration(milliseconds: 200),
-    this.backwardDelay,
-    this.backwardDuration,
+    this.reverseTransition,
+    this.reverseCurve,
+    this.reverseDelay,
+    this.reverseDuration,
     this.onStart,
     this.onPause,
     this.onContinue,
@@ -123,21 +131,38 @@ class AnimatedRepeatable extends StatefulWidget {
   /// The [duration] of the animation.
   final Duration duration;
 
+  /// Defines the type of animation applied to the child widget for the backward direction
+  /// (only applicable if [mirror] is `true`).
+  ///
+  /// Allows for specifying a different animation than the forward transition
+  /// for a more complex mirroring effect.
+  ///
+  /// Defaults to `null`, which means the backward animation will use the same
+  /// transition function as the forward animation specified by the [transition] property.
+  final AnimatedRepeatableTransitionBuilder? reverseTransition;
+
+  /// The curve to use in the backward direction.
+  /// (only applicable if [mirror] is `true`).
+  ///
+  /// Defaults to `null`, which means the backward animation will use
+  /// the same curve as the forward animation specified by the [curve] property.
+  final Curve? reverseCurve;
+
   /// The delay before the animation starts playing in the backward direction
-  /// (only applicable if [mirror] is true). This allows for a slight pause between
+  /// (only applicable if [mirror] is `true`). This allows for a slight pause between
   /// the forward and backward animations in the mirroring effect.
   ///
   /// Defaults to `null`, which means the backward animation will use
   /// the same delay as the forward animation specified by the [delay] property.
-  final Duration? backwardDelay;
+  final Duration? reverseDelay;
 
   /// An optional duration that can be specified for the backward animation
-  /// (only applicable if [mirror] is true), allowing for a different duration
+  /// (only applicable if [mirror] is `true`), allowing for a different duration
   /// compared to the forward animation, creating an asymmetrical mirroring effect.
   ///
   /// Defaults to `null`, which means the backward animation will use the same duration
   /// as the forward animation specified by the duration property.
-  final Duration? backwardDuration;
+  final Duration? reverseDuration;
 
   /// Called only once at the very beginning when
   /// the animation starts playing for the first time.
@@ -351,6 +376,13 @@ class AnimatedRepeatableState extends State<AnimatedRepeatable>
   /// The [Animation] that is driven by the [AnimationController].
   late Animation<double> animation;
 
+  /// The effective transition builder should use.
+  AnimatedRepeatableTransitionBuilder get _transition {
+    return controller.status == AnimationStatus.reverse
+        ? widget.reverseTransition ?? widget.transition
+        : widget.transition;
+  }
+
   /// Track of how many times the animation cycle has finished playing.
   int cycle = 0;
 
@@ -427,6 +459,7 @@ class AnimatedRepeatableState extends State<AnimatedRepeatable>
       CurvedAnimation(
         parent: controller,
         curve: widget.curve,
+        reverseCurve: widget.reverseCurve,
       ),
     );
 
@@ -451,7 +484,7 @@ class AnimatedRepeatableState extends State<AnimatedRepeatable>
 
   /// Move backward
   void _backwardAnimation() async {
-    await Future.delayed(widget.backwardDelay ?? widget.delay);
+    await Future.delayed(widget.reverseDelay ?? widget.delay);
     if (!mounted) return;
     controller.reverse();
   }
@@ -513,7 +546,7 @@ class AnimatedRepeatableState extends State<AnimatedRepeatable>
     // Create controller and register the events handler
     controller = AnimationController(
       duration: widget.duration,
-      reverseDuration: widget.backwardDuration,
+      reverseDuration: widget.reverseDuration,
       vsync: this,
     )..addListener(_handleEvents);
 
@@ -530,7 +563,7 @@ class AnimatedRepeatableState extends State<AnimatedRepeatable>
 
     // Duration might have changed, so update the [AnimationController]
     controller.duration = widget.duration;
-    controller.reverseDuration = widget.backwardDuration;
+    controller.reverseDuration = widget.reverseDuration;
 
     // Restart the animation when certain prop changed
     if (widget.repeat != oldWidget.repeat ||
@@ -554,9 +587,8 @@ class AnimatedRepeatableState extends State<AnimatedRepeatable>
 
   @override
   Widget build(BuildContext context) {
-    // TODO: backward transition
     // TODO: builder constructor
     final child = widget.wrapper?.call(widget.child, this) ?? widget.child;
-    return widget.transition(child, animation);
+    return _transition(child, animation);
   }
 }
