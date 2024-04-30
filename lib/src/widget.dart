@@ -498,7 +498,8 @@ class AnimatedRepeatableState extends State<AnimatedRepeatable>
   /// End the animation
   bool _endAnimation() {
     // Increase cycle counter then invoke the callback
-    widget.onCycle?.call(++cycle);
+    cycle++;
+    widget.onCycle?.call(cycle);
 
     // End the animation if cycle has exceed
     if (isDefinitely && _cycleExceed) {
