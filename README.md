@@ -61,7 +61,7 @@ AnimatedRepeatable(
   reverse: true,
 
   // Built-in fade transition animation, you can use
-  // a custom AnimatedRepeatableTransitionBuilder for more complex animations
+  // a custom AnimatedRepeatableBuilder for more complex animations
   transition: AnimatedRepeatable.fade,
 
   // Use a curve to ease the animation (optional)
@@ -93,8 +93,8 @@ AnimatedRepeatable(
   onComplete: () => debugPrint('Animation Completed'),
 
   // Allows chain effect
-  wrapper: (child, status) {
-    if (status.isCompleted) {
+  wrapper: (child, state) {
+    if (state.isCompleted) {
       return AnimatedRepeatable(
         delay: const Duration(milliseconds: 300),
         duration: const Duration(milliseconds: 700),

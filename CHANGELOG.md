@@ -1,3 +1,7 @@
+## 1.1.0
+
+* Improved builder parameter.
+
 ## 1.0.0
 
 * Refactor from `loop_transition` package.
