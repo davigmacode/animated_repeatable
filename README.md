@@ -1,16 +1,16 @@
-[![Pub Version](https://img.shields.io/pub/v/loop_transition)](https://pub.dev/packages/loop_transition) ![GitHub](https://img.shields.io/github/license/davigmacode/flutter_loop_transition) [![GitHub](https://badgen.net/badge/icon/buymeacoffee?icon=buymeacoffee&color=yellow&label)](https://www.buymeacoffee.com/davigmacode) [![GitHub](https://badgen.net/badge/icon/ko-fi?icon=kofi&color=red&label)](https://ko-fi.com/davigmacode)
+[![Pub Version](https://img.shields.io/pub/v/animated_repeatable)](https://pub.dev/packages/animated_repeatable) ![GitHub](https://img.shields.io/github/license/davigmacode/flutter_animated_repeatable) [![GitHub](https://badgen.net/badge/icon/buymeacoffee?icon=buymeacoffee&color=yellow&label)](https://www.buymeacoffee.com/davigmacode) [![GitHub](https://badgen.net/badge/icon/ko-fi?icon=kofi&color=red&label)](https://ko-fi.com/davigmacode)
 
-The `loop_transition` package offers a versatile widget called `LoopTransition` that allows you to apply repeatable animated transitions to a child widget. These transitions cycle through a specified number of times, creating dynamic effects within your UI.
+The `animated_repeatable` package offers a versatile widget called `AnimatedRepeatable` that allows you to apply repeatable animated transitions to a child widget. These transitions cycle through a specified number of times, creating dynamic effects within your UI.
 
-[![Preview](https://github.com/davigmacode/flutter_loop_transition/raw/main/media/preview.gif)](https://davigmacode.github.io/flutter_loop_transition)
+[![Preview](https://github.com/davigmacode/flutter_animated_repeatable/raw/main/media/preview.gif)](https://davigmacode.github.io/flutter_animated_repeatable)
 
-[Demo](https://davigmacode.github.io/flutter_loop_transition)
+[Demo](https://davigmacode.github.io/flutter_animated_repeatable)
 
 ## Features
 
 * Applies repeatable animated transitions to a child widget.
 * Offers various built-in transition functions (`fade`, `spin`, `slide`, `zoom`, `shimmer`).
-* Allows customization of transitions using the LoopTransitionBuilder.
+* Allows customization of transitions using the AnimatedRepeatableTransitionBuilder.
 * Supports pausing and resuming playback using the pause property.
 * Provides control over animation behavior with properties like:
   * `repeat`: Number of times to repeat the animation loop (-1 for infinite)
@@ -22,8 +22,10 @@ The `loop_transition` package offers a versatile widget called `LoopTransition` 
   * `curve`: The animation curve that controls the easing of the animation.
   * `delay`: Delay before the animation starts.
   * `duration`: Animation duration for each direction (forward and backward if applicable).
-  * `backwardDelay`: Delay before starting the backward animation (in mirroring effect)
-  * `backwardDuration`: Optional duration for the backward animation (mirroring effect)
+  * `reverseTransition`: The transition applied for the backward direction (in mirroring).
+  * `reverseCurve`: The curve to use in the backward direction (in mirroring effect).
+  * `reverseDelay`: Delay before starting the backward animation (in mirroring effect)
+  * `reverseDuration`: Optional duration for the backward animation (mirroring effect)
 * Triggers callbacks at various animation lifecycle stages:
   * `onStart`: Called only once at the very beginning of the first animation play-through.
   * `onPause`: Called whenever the animation is paused.
@@ -33,16 +35,16 @@ The `loop_transition` package offers a versatile widget called `LoopTransition` 
 
 ## Usage
 
-To read more about classes and other references used by `loop_transition`, see the [API Reference](https://pub.dev/documentation/loop_transition/latest/).
+To read more about classes and other references used by `animated_repeatable`, see the [API Reference](https://pub.dev/documentation/animated_repeatable/latest/).
 
 ### Import the package
 ```dart
-import 'package:loop_transition/loop_transition.dart';
+import 'package:animated_repeatable/animated_repeatable.dart';
 ```
 
 ### Create a repeatable transition widget
 ```dart
-LoopTransition(
+AnimatedRepeatable(
   // Repeat the animation loop 3 times (in addition to the initial cycle)
   repeat: 3,
 
@@ -58,8 +60,9 @@ LoopTransition(
   // Play the animation in reverse initially (optional)
   reverse: true,
 
-  // Built-in fade transition animation (you can use a custom LoopTransitionBuilder for more complex animations)
-  transition: LoopTransition.fade,
+  // Built-in fade transition animation, you can use
+  // a custom AnimatedRepeatableTransitionBuilder for more complex animations
+  transition: AnimatedRepeatable.fade,
 
   // Use a curve to ease the animation (optional)
   curve: Curves.easeInOut,
@@ -70,11 +73,17 @@ LoopTransition(
   // Set the animation duration to 500 milliseconds for each direction (forward and backward)
   duration: const Duration(milliseconds: 500),
 
+  // Use different transition for backward animation (optional)
+  reverseTransition: AnimatedRepeatable.shakeX,
+
+  // Use a curve to ease the animation (optional)
+  curve: Curves.bounceOut,
+
   // Set a delay before the reverse animation starts (optional)
-  backwardDelay: const Duration(milliseconds: 200),
+  reverseDelay: const Duration(milliseconds: 200),
 
   // Set a different duration for the backward animation (optional)
-  backwardDuration: const Duration(milliseconds: 500),
+  reverseDuration: const Duration(milliseconds: 500),
 
   // Callbacks for various animation lifecycle events (optional)
   onStart: () => debugPrint('Animation Started'),
@@ -86,10 +95,10 @@ LoopTransition(
   // Allows chain effect
   wrapper: (child, status) {
     if (status.isCompleted) {
-      return LoopTransition(
+      return AnimatedRepeatable(
         delay: const Duration(milliseconds: 300),
         duration: const Duration(milliseconds: 700),
-        transition: LoopTransition.shimmer(colors: [
+        transition: AnimatedRepeatable.shimmer(colors: [
           Colors.black87,
           Colors.blue,
           Colors.black87,
@@ -128,7 +137,7 @@ final myCustomTransition = (child, animation) {
   return Container(child: child); // Wrap the child widget
 };
 
-LoopTransition(
+AnimatedRepeatable(
   transition: myCustomTransition,
   child: MyWidget(),
 ),
