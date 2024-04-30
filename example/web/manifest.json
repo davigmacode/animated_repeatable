@@ -1,6 +1,6 @@
 {
-    "name": "loop_transition_example",
-    "short_name": "loop_transition_example",
+    "name": "animated_repeatable_example",
+    "short_name": "animated_repeatable_example",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

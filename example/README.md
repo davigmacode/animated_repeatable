@@ -1,4 +1,4 @@
-# loop_transition_example
+# animated_repeatable_example
 
 A new Flutter project.
 

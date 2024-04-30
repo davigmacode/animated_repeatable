@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:loop_transition/loop_transition.dart';
+import 'package:animated_repeatable/animated_repeatable.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,18 +34,18 @@ class MyHomePage extends StatelessWidget {
             Wrap(
               spacing: 20,
               children: [
-                const LoopTransition(
+                const AnimatedRepeatable(
                   curve: Curves.bounceInOut,
                   duration: Duration(milliseconds: 1500),
                   reverse: true,
                   child: FlutterLogo(size: 64),
                 ),
-                LoopTransition(
+                AnimatedRepeatable(
                   mirror: true,
                   curve: Curves.easeInOut,
                   duration: const Duration(milliseconds: 1500),
                   backwardDuration: const Duration(milliseconds: 500),
-                  transition: LoopTransition.zoom(.5, 1.2),
+                  transition: AnimatedRepeatable.zoom(.5, 1.2),
                   child: const Icon(
                     Icons.favorite,
                     size: 64,
@@ -65,19 +65,19 @@ class MyHomePage extends StatelessWidget {
             const Wrap(
               spacing: 20,
               children: [
-                LoopTransition(
+                AnimatedRepeatable(
                   duration: Duration(milliseconds: 1500),
-                  transition: LoopTransition.spin,
+                  transition: AnimatedRepeatable.spin,
                   child: Icon(
                     Icons.settings,
                     size: 64,
                   ),
                 ),
                 PausableTransition(),
-                LoopTransition(
+                AnimatedRepeatable(
                   duration: Duration(milliseconds: 1500),
                   reverse: true,
-                  transition: LoopTransition.spin,
+                  transition: AnimatedRepeatable.spin,
                   child: Icon(
                     Icons.settings,
                     size: 64,
@@ -89,18 +89,18 @@ class MyHomePage extends StatelessWidget {
             Wrap(
               spacing: 20,
               children: [
-                const LoopTransition(
+                const AnimatedRepeatable(
                   curve: Curves.bounceOut,
                   delay: Duration(milliseconds: 1000),
                   duration: Duration(milliseconds: 700),
-                  transition: LoopTransition.shakeX,
+                  transition: AnimatedRepeatable.shakeX,
                   child: Text('Shake Horizontally'),
                 ),
-                LoopTransition(
+                AnimatedRepeatable(
                   curve: Curves.bounceOut,
                   delay: const Duration(milliseconds: 1000),
                   duration: const Duration(milliseconds: 700),
-                  transition: LoopTransition.shake(
+                  transition: AnimatedRepeatable.shake(
                     direction: Axis.vertical,
                     distance: 7,
                   ),
@@ -122,11 +122,11 @@ class MyHomePage extends StatelessWidget {
                     color: Colors.black87,
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  child: LoopTransition(
+                  child: AnimatedRepeatable(
                     curve: Curves.linear,
                     delay: const Duration(milliseconds: 1000),
                     duration: const Duration(milliseconds: 900),
-                    transition: LoopTransition.shimmer(
+                    transition: AnimatedRepeatable.shimmer(
                       colors: [
                         Colors.white,
                         Colors.amber,
@@ -182,7 +182,7 @@ class PausableTransition extends StatefulWidget {
 }
 
 class _PausableTransitionState extends State<PausableTransition> {
-  final key = GlobalKey<LoopTransitionState>();
+  final key = GlobalKey<AnimatedRepeatableState>();
 
   bool paused = false;
 
@@ -194,7 +194,7 @@ class _PausableTransitionState extends State<PausableTransition> {
 
   @override
   Widget build(BuildContext context) {
-    return LoopTransition(
+    return AnimatedRepeatable(
       key: key,
       pause: paused,
       repeat: 1,
@@ -206,17 +206,17 @@ class _PausableTransitionState extends State<PausableTransition> {
       onCycle: (cycle) => debugPrint('Animation Cycle: $cycle'),
       onComplete: () => debugPrint('Animation Completed'),
       duration: const Duration(milliseconds: 1000),
-      transition: LoopTransition.spin,
+      transition: AnimatedRepeatable.spin,
       wrapper: (child, status) {
         if (status.isCompleted) {
-          return LoopTransition(
+          return AnimatedRepeatable(
             pause: paused,
             mirror: true,
             continuity: false,
             delay: const Duration(milliseconds: 300),
             duration: const Duration(milliseconds: 700),
             backwardDuration: const Duration(milliseconds: 500),
-            transition: LoopTransition.shimmer(colors: [
+            transition: AnimatedRepeatable.shimmer(colors: [
               Colors.black87,
               Colors.blue,
               Colors.black87,
@@ -252,18 +252,18 @@ class InteractiveThreeArrows extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LoopTransition(
+    return AnimatedRepeatable(
       mirror: true,
       curve: Curves.easeInCubic,
       delay: const Duration(milliseconds: 300),
       duration: const Duration(milliseconds: 900),
       backwardDelay: Duration.zero,
-      transition: LoopTransition.slide(const Offset(0, -.3)),
-      child: LoopTransition(
+      transition: AnimatedRepeatable.slide(const Offset(0, -.3)),
+      child: AnimatedRepeatable(
         curve: Curves.linear,
         delay: const Duration(milliseconds: 1000),
         duration: const Duration(milliseconds: 900),
-        transition: LoopTransition.shimmer(
+        transition: AnimatedRepeatable.shimmer(
           colors: [
             Colors.blue,
             Colors.white,
