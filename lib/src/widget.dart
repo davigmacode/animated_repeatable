@@ -402,8 +402,11 @@ class AnimatedRepeatableState extends State<AnimatedRepeatable>
   /// (if [widget.repeat] is not set to `-1` for infinite loops).
   bool isCompleted = false;
 
+  /// Track whether the animation is running.
+  bool get isAnimating => controller.isAnimating;
+
   /// Track whether the animation is not running.
-  bool get isIdle => controller.isAnimating;
+  bool get isIdle => !isAnimating;
 
   /// Indicates the animation should play forward, then backward in a mirroring effect.
   bool get isMirror => widget.mirror;
