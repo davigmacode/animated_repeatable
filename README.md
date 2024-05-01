@@ -76,8 +76,8 @@ AnimatedRepeatable(
   // Use different transition for backward animation (optional)
   reverseTransition: AnimatedRepeatable.shakeX,
 
-  // Use a curve to ease the animation (optional)
-  curve: Curves.bounceOut,
+  // Use a curve to ease the backward animation (optional)
+  reverseCurve: Curves.bounceOut,
 
   // Set a delay before the reverse animation starts (optional)
   reverseDelay: const Duration(milliseconds: 200),
@@ -141,6 +141,66 @@ AnimatedRepeatable(
   transition: myCustomTransition,
   child: MyWidget(),
 ),
+```
+
+### Programmatic Play/Pause
+With this approach, you can control the animation playback (play/pause) of the AnimatedRepeatable widget from anywhere in your code using the globally accessible key.
+```dart
+import 'package:flutter/material.dart';
+import 'package:animated_repeatable/animated_repeatable.dart';
+
+final repeatableKey = GlobalKey<AnimatedRepeatableState>();
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Programmatic AnimatedRepeatable'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedRepeatable(
+                key: repeatableKey,
+                repeat: -1, // repeat infinitely
+                mirror: true,
+                transition: AnimatedRepeatable.fade,
+                duration: const Duration(seconds: 2),
+                child: const FlutterLogo(size: 100),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      repeatableKey.currentState?.play();
+                    },
+                    child: const Text('Play'),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      repeatableKey.currentState?.pause();
+                    },
+                    child: const Text('Pause'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 ```
 
 ## Sponsoring

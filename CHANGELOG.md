@@ -1,3 +1,7 @@
+## 1.1.2
+
+* Fixed is animating and idle state.
+
 ## 1.1.1
 
 * Fixed cycle not increase when onCycle not defined.
