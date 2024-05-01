@@ -18,7 +18,7 @@ The `animated_repeatable` package offers a versatile widget called `AnimatedRepe
   * `continuity`: Controls whether the animation should maintain continuity when paused.
   * `mirror`: Whether the animation should play forward, then backward in a mirroring effect.
   * `reverse`: Controls the initial animation direction (forward or backward)
-  * `transition`: The LoopTransitionBuilder function that defines the animation behavior.
+  * `transition`: The AnimatedRepeatableBuilder function that defines the animation behavior.
   * `curve`: The animation curve that controls the easing of the animation.
   * `delay`: Delay before the animation starts.
   * `duration`: Animation duration for each direction (forward and backward if applicable).
@@ -120,16 +120,16 @@ AnimatedRepeatable(
 ### Built-in transitions
 The package provides various built-in transitions you can use directly:
 
-* `LoopTransition.fade`: Fades the child widget in and out during the animation cycle.
-* `LoopTransition.spin`: Rotates the child widget around a central point.
-* `LoopTransition.slide`: Slides the child widget to a specified position.
-* `LoopTransition.zoom`: Zooms the child widget in and out.
-* `LoopTransition.shimmer`: Creates a shimmering effect on the child widget.
-* `LoopTransition.shakeX`: Shakes the child widget horizontally.
-* `LoopTransition.shakeY`: Shakes the child widget vertically.
+* `AnimatedRepeatable.fade`: Fades the child widget in and out during the animation cycle.
+* `AnimatedRepeatable.spin`: Rotates the child widget around a central point.
+* `AnimatedRepeatable.slide`: Slides the child widget to a specified position.
+* `AnimatedRepeatable.zoom`: Zooms the child widget in and out.
+* `AnimatedRepeatable.shimmer`: Creates a shimmering effect on the child widget.
+* `AnimatedRepeatable.shakeX`: Shakes the child widget horizontally.
+* `AnimatedRepeatable.shakeY`: Shakes the child widget vertically.
 
 ### Custom transitions
-For more control, define your own transition functions using `LoopTransitionBuilder`:
+For more control, define your own transition functions using `AnimatedRepeatableBuilder`:
 
 ```dart
 final myCustomTransition = (child, animation) {

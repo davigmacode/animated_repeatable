@@ -1,3 +1,7 @@
+## 1.1.3
+
+* Update documentation.
+
 ## 1.1.2
 
 * Fixed is animating and idle state.
