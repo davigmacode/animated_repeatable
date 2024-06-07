@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animated_repeatable/animated_repeatable.dart';
+import 'package:wx_text/wx_text.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Loop Transition Example',
+      title: 'AnimatedRepeatable Example',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -31,6 +32,13 @@ class MyHomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            const WxText.displayMedium(
+              'AnimatedRepeatable',
+              style: TextStyle(
+                letterSpacing: -3,
+              ),
+            ),
+            const SizedBox(height: 50),
             Wrap(
               spacing: 20,
               children: [
